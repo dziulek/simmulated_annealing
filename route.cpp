@@ -26,6 +26,52 @@ float Route::calcWaitingTime(const routeCustomer &prec, const Customer &succ){
     return std::max(0.0f, succ.e - arrival);
 }
 
+bool Route::checkIfPossibleDeletionInsertion(const Route &r, const Customer &c, const unsigned int _i, float &routeOffsetIn, float &routeOffsetOut){
+
+    if( abs(routeOffsetIn) <= eps){
+
+        routeOffsetOut = 0.0f;
+        return 1;
+    }
+
+    if(routeOffsetIn > 0){
+        
+        float pushRoute = routeOffsetIn;
+
+        for(int i = _i + 1; i < r.getSizeOfroute() - 2; i++){
+
+            if( r[i].beginTime + pushRoute > r[i].customer->l) return 0;//cannot push customer due to his window constraints
+
+            pushRoute = std::max(0.0f, pushRoute - r[i + 1].waitingTime);
+        }
+        if(r[i].beginTime + pushRoute > r[i].customer->l) return 0;
+        routeOffsetOut = pushRoute;
+    }
+    else {
+        
+        float pushRoute = routeOffsetIn, timeOverflow;
+
+        for(int i = _i + 1; i < r.getSizeOfroute() -1; i++){
+
+            timeOverflow = r[i].beginTime - r[i].customer->e;
+
+            if(timeOverflow + pushRoute <= eps) pushRoute = -timeOverflow;
+            if(abs(pushRoute) < epsilon){
+
+                routeOffsetOut = 0;
+                return 1;
+            }
+        }
+        routeOffsetOut = pushRoute;
+        return 1;
+    }
+
+    return 0;
+
+}
+
+
+
 bool Route::appendCustomer(Customer &c){
 
     float d = this->route.back().distance + Customer::dist(c, *route.back().customer);
@@ -38,6 +84,18 @@ bool Route::appendCustomer(Customer &c){
     return true;
 }
 
+const routeCustomer & Route::operator[](std::size_t _i) const {
+
+    return this->route[_i];
+}
+
+const routeCustomer & Route::operator<=(const Route & r){
+    //objective function needed
+}
+
+const routeCustomer & Route::operator>=(const Route & r){
+    //objective function needed
+}
 
 bool Route::insertCustomerIntoRoute(Customer &c, const unsigned int i){
 
@@ -72,6 +130,14 @@ bool Route::insertCustomerIntoRoute(Customer &c, const unsigned int i){
     this->route.back().distance += distanceDiff;
 
     return true;
+}
+
+bool Route::checkIfPossibleDeleteInsert(const Route &r1, const unsigned int _i, const Route &r2, const unsigned int _j, const routeImprovement &score){
+
+    if(r1[_i].customer->id == 0) return 0;
+    if( int(r2.getRemainingCapacity) == 0 ) return 0;
+
+
 }
 
 
