@@ -360,6 +360,7 @@ double delta_cost(VVIFF &current_solution){
 double probability(double &delta) {
 	return exp(-delta / Temperature);
 }
+/////////////////////////////////////////////////////////////////////////////implemented
 //ruchy w sasiedztwie
 bool delete_insert(VVIFF &solution,int &a_route,int &b_route,int &a,int &b){//a i b to indeksy,a indeks usuwany, b-wstawiany
     //sprawdzmy czy pojemnosc jest dozwolona
@@ -400,6 +401,7 @@ bool delete_insert(VVIFF &solution,int &a_route,int &b_route,int &a,int &b){//a 
     }
     return 0;
 }
+//////////////////////////////////////////////////////////////////////////////////////////////
 void exe_delete_insert(VVIFF &solution,int &a_route,int &b_route,int &a,int &b){//a i b to indeksy,a indeks usuwany, b-wstawiany
     //najpierw wstawmy a do trasy b
     IFF aa=solution[a_route][a];
@@ -454,6 +456,7 @@ void exe_delete_insert(VVIFF &solution,int &a_route,int &b_route,int &a,int &b){
     solution[solution.size()-1][2].ND.ST=0;
     //oby dzialalo
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////implemented
 bool one_to_one(VVIFF &solution,int &a_route,int &b_route,int &a,int &b){
     if(solution[a_route][a].ST==0||solution[b_route][b].ST==0)return 0;
 
@@ -489,6 +492,7 @@ bool one_to_one(VVIFF &solution,int &a_route,int &b_route,int &a,int &b){
     }
     return 0;
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void exe_one_to_one(VVIFF &solution,int &a_route,int &b_route,int &a,int &b){
     // jest mozliwa zamiana
     IFF aa,bb;

@@ -12,6 +12,11 @@ float Route::newBeginTime(const routeCustomer &prec, const Customer &succ){
     return std::max(succ.e, prec.beginTime + Customer::dist(succ, *prec.customer));
 }
 
+float Route::newBeginTime(const Customer &prec, const Customer &succ, const float beginTimePrec){
+
+    return std::max(succ.e, beginTimePrec + Customer::dist(succ, prec));
+}
+
 float Route::calcWaitingTime(const unsigned int i){
 
     float arrival = this->route[i - 1].beginTime + route[i - 1].customer->d + Customer::dist(*route[i].customer, *route[i - 1].customer);
@@ -26,7 +31,7 @@ float Route::calcWaitingTime(const routeCustomer &prec, const Customer &succ){
     return std::max(0.0f, succ.e - arrival);
 }
 
-bool Route::checkIfPossibleDeletionInsertion(const Route &r, const Customer &c, const unsigned int _i, float &routeOffsetIn, float &routeOffsetOut){
+bool Route::checkIfPossibleDeletionInsertion(const Route &r, const unsigned int _i, float &routeOffsetIn, float &routeOffsetOut){
 
     if( abs(routeOffsetIn) <= eps){
 
@@ -44,7 +49,7 @@ bool Route::checkIfPossibleDeletionInsertion(const Route &r, const Customer &c, 
 
             pushRoute = std::max(0.0f, pushRoute - r[i + 1].waitingTime);
         }
-        if(r[i].beginTime + pushRoute > r[i].customer->l) return 0;
+        if(r[r.getSizeOfroute() - 1].beginTime + pushRoute > r[r.getSizeOfroute() - 1].customer->l) return 0;
         routeOffsetOut = pushRoute;
     }
     else {
@@ -56,7 +61,7 @@ bool Route::checkIfPossibleDeletionInsertion(const Route &r, const Customer &c, 
             timeOverflow = r[i].beginTime - r[i].customer->e;
 
             if(timeOverflow + pushRoute <= eps) pushRoute = -timeOverflow;
-            if(abs(pushRoute) < epsilon){
+            if(abs(pushRoute) < eps){
 
                 routeOffsetOut = 0;
                 return 1;
@@ -132,12 +137,83 @@ bool Route::insertCustomerIntoRoute(Customer &c, const unsigned int i){
     return true;
 }
 
-bool Route::checkIfPossibleDeleteInsert(const Route &r1, const unsigned int _i, const Route &r2, const unsigned int _j, const routeImprovement &score){
+bool Route::checkIfPossibleDeleteInsert(const Route &r1, const unsigned int _i, const Route &r2, const unsigned int _j, routeImprovement &score){
 
     if(r1[_i].customer->id == 0) return 0;
-    if( int(r2.getRemainingCapacity) == 0 ) return 0;
+    if( int(r2.getRemainingCapacity()) == 0 ) return 0;
 
+    float offIn_r1, offOut_r1;
 
+    offIn_r1 = Route::newBeginTime(r1[_i - 1], *r1[_i + 1].customer) - r1[_i + 1].beginTime;
+
+    if(Route::checkIfPossibleDeletionInsertion(r1, _i, offIn_r1, offOut_r1)){
+
+        float offIn_r2, offOut_r2;
+
+        float temp = Route::newBeginTime(r2[_j - 1], *r1[_i].customer);
+        if(temp > r1[_i].customer->l) return 0;
+
+        offIn_r2 = Route::newBeginTime(r1[_i], *r2[_j].customer) - r2[_j].beginTime;
+
+        if(checkIfPossibleDeletionInsertion(r2, _j, offIn_r2, offOut_r2)){
+
+            score.routeCostDiff = offOut_r1 + offOut_r2;
+            float d_r1 = Customer::dist(*r1[_i - 1].customer, *r1[_i + 1].customer) - (r1[_i + 1].distance - r1[_i - 1].distance);
+            float d_r2 = (r2[_j + 1].distance - r2[_j - 1].distance) - Customer::dist(*r2[_j - 1].customer, *r2[_j + 1].customer);
+
+            score.routeDistanceDiff = d_r1 + d_r2;
+
+            if(r1.getSizeOfroute() == 3) score.routeNumber = -1;
+            else score.routeNumber = 0;
+
+            return 1;
+        }
+
+    }
+    return 0;
 }
 
+bool Route::checkIfPossibleSwapBetweenRoutes(const Route &r1, const unsigned int _i, const Route &r2, const unsigned int _j, routeImprovement &score){
+
+    if(r1[_i].customer->id == 0 || r2[_j].customer->id == 0) return 0;
+
+    if(r1.getRemainingCapacity() - r1[_i].customer->q + r2[_j].customer->q < 0) return 0;
+    if(r2.getRemainingCapacity() - r2[_j].customer->q + r1[_i].customer->q < 0) return 0;
+
+    float temp_r1, temp_r2;
+
+    temp_r1 = Route::newBeginTime(r1[_i - 1], *r2[_j].customer);
+    if(temp_r1 > r2[_j].customer->l) return 0;
+
+    temp_r2 = Route::newBeginTime(r2[_j - 1], *r1[_i].customer);
+    if(temp_r2 > r1[_i].customer->l) return 0;
+
+    float offIn_r1, offOut_r1, offIn_r2, offOut_r2;
+
+    offIn_r1 = Route::newBeginTime(*r1[_i - 1].customer, *r2[_j].customer, temp_r1);
+    offIn_r2 = Route::newBeginTime(*r2[_j - 1].customer, *r1[_i].customer, temp_r2);
+
+    if(checkIfPossibleDeletionInsertion(r1, _i + 1, offIn_r1, offOut_r1)){
+
+        if(checkIfPossibleDeletionInsertion(r2, _j + 1, offIn_r2, offOut_r2)){
+
+            score.routeCostDiff = offOut_r1 + offOut_r2;
+
+            float d_r1, d_r2;
+            d_r1 = Customer::dist(*r1[_i -1].customer, *r2[_j].customer) 
+                    + Customer::dist(*r2[_j].customer, *r1[_i + 1].customer)
+                    + (r1[_i + 1].distance - r1[_i - 1].distance);
+            
+            d_r2 = Customer::dist(*r2[_j - 1].customer, *r1[_i].customer)
+                    + Customer::dist(*r1[_i].customer, *r2[_j + 1].customer)
+                    + (r2[_j + 1].distance - r2[_j - 1].distance);
+
+            score.routeDistanceDiff = d_r1 + d_r2;
+            score.routeNumber = 0;
+
+            return 1;
+        }
+    }
+    return 0;
+}
 
