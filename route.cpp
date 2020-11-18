@@ -31,7 +31,7 @@ float Route::calcWaitingTime(const routeCustomer &prec, const Customer &succ){
     return std::max(0.0f, succ.e - arrival);
 }
 
-bool Route::checkIfPossibleDeletionInsertion(const Route &r, const unsigned int _i, float &routeOffsetIn, float &routeOffsetOut){
+bool Route::checkIfPossiblePushRoute(const Route &r, const unsigned int _i, float &routeOffsetIn, float &routeOffsetOut){
 
     if( abs(routeOffsetIn) <= eps){
 
@@ -146,7 +146,7 @@ bool Route::checkIfPossibleDeleteInsert(const Route &r1, const unsigned int _i, 
 
     offIn_r1 = Route::newBeginTime(r1[_i - 1], *r1[_i + 1].customer) - r1[_i + 1].beginTime;
 
-    if(Route::checkIfPossibleDeletionInsertion(r1, _i, offIn_r1, offOut_r1)){
+    if(Route::checkIfPossiblePushRoute(r1, _i, offIn_r1, offOut_r1)){
 
         float offIn_r2, offOut_r2;
 
@@ -155,7 +155,7 @@ bool Route::checkIfPossibleDeleteInsert(const Route &r1, const unsigned int _i, 
 
         offIn_r2 = Route::newBeginTime(r1[_i], *r2[_j].customer) - r2[_j].beginTime;
 
-        if(checkIfPossibleDeletionInsertion(r2, _j, offIn_r2, offOut_r2)){
+        if(checkIfPossiblePushRoute(r2, _j, offIn_r2, offOut_r2)){
 
             score.routeCostDiff = offOut_r1 + offOut_r2;
             float d_r1 = Customer::dist(*r1[_i - 1].customer, *r1[_i + 1].customer) - (r1[_i + 1].distance - r1[_i - 1].distance);
@@ -193,9 +193,9 @@ bool Route::checkIfPossibleSwapBetweenRoutes(const Route &r1, const unsigned int
     offIn_r1 = Route::newBeginTime(*r1[_i - 1].customer, *r2[_j].customer, temp_r1);
     offIn_r2 = Route::newBeginTime(*r2[_j - 1].customer, *r1[_i].customer, temp_r2);
 
-    if(checkIfPossibleDeletionInsertion(r1, _i + 1, offIn_r1, offOut_r1)){
+    if(checkIfPossiblePushRoute(r1, _i + 1, offIn_r1, offOut_r1)){
 
-        if(checkIfPossibleDeletionInsertion(r2, _j + 1, offIn_r2, offOut_r2)){
+        if(checkIfPossiblePushRoute(r2, _j + 1, offIn_r2, offOut_r2)){
 
             score.routeCostDiff = offOut_r1 + offOut_r2;
 
@@ -215,5 +215,10 @@ bool Route::checkIfPossibleSwapBetweenRoutes(const Route &r1, const unsigned int
         }
     }
     return 0;
+}
+
+bool Route::execDeleteInsert(const Route &r1, const unsigned int _i, const Route &r2, const unsigned int _j){
+
+    
 }
 

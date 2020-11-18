@@ -38,7 +38,9 @@ class Route{
         float calcWaitingTime(const unsigned int i);
         float calcWaitingTime(const routeCustomer &prec, const Customer &succ);
 
-        static bool checkIfPossibleDeletionInsertion(const Route &r, const unsigned int _i, float &routeOffsetIn, float &routeOffsetOut);
+        static bool checkIfPossiblePushRoute(const Route &r, const unsigned int _i, float &routeOffsetIn, float &routeOffsetOut);
+                /////////function checks if route can be moved in time by routeOffsetIn (positive -> forward, negative -> backward)
+                /////////_i is the begin index
                 /////////route offsetOut is -1 if insertion was not possible, and if was it returns 
                 /////////value by which the route was moved in time due to insertion
                 /////////positive value means extension of a route, negative value implies shorten of a route
