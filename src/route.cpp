@@ -1,22 +1,6 @@
 #include "route.hpp"
 
 
-float Route::newBeginTime(const unsigned int i){
-
-    return std::max(this->route[i].customer->e,
-                    this->route[i - 1].beginTime + Customer::dist(*route[i - 1].customer, *route[i].customer));
-}
-
-float Route::newBeginTime(const routeCustomer &prec, const Customer &succ){
-
-    return std::max(succ.e, prec.beginTime + Customer::dist(succ, *prec.customer));
-}
-
-float Route::newBeginTime(const Customer &prec, const Customer &succ, const float beginTimePrec){
-
-    return std::max(succ.e, beginTimePrec + Customer::dist(succ, prec));
-}
-
 float Route::calcWaitingTime(const unsigned int i){
 
     float arrival = this->route[i - 1].beginTime + route[i - 1].customer->d + Customer::dist(*route[i].customer, *route[i - 1].customer);
