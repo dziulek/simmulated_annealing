@@ -1,6 +1,13 @@
 #include "route.hpp"
 
 
+float Route::calcWaitingTime(const unsigned int i){
+
+    float arrival = this->route[i - 1].beginTime + route[i - 1].customer->d + Customer::dist(*route[i].customer, *route[i - 1].customer);
+
+    return std::max(0.0f, this->route[i].customer->e - arrival);
+}
+
 float Route::calcWaitingTime(const routeCustomer &prec, const Customer &succ){
 
     float arrival = prec.beginTime + prec.customer->d + Customer::dist(*prec.customer, succ);
