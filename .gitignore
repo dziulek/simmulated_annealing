@@ -32,6 +32,6 @@
 *.app
 
 
-
+.vscode/
 old_version.cpp
 build/
