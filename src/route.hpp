@@ -28,7 +28,7 @@ struct routeImprovement{
 class Route{
 
     private:
-
+    
         std::vector<routeCustomer> route;
         float totalRouteCost;
         float totalTimeCost;
@@ -44,17 +44,7 @@ class Route{
 
             return std::max(succ.e, prec.beginTime + Customer::dist(succ, *prec.customer));
         }
-        static inline float newBeginTime(const Customer &prec, const Customer &succ, const float beginTimePrec){
-
-        inline float newBeginTime(const unsigned int i){
-
-            return std::max(this->route[i].customer->e,
-                            this->route[i - 1].beginTime + Customer::dist(*route[i - 1].customer, *route[i].customer));
-        }
-        static inline float newBeginTime(const routeCustomer &prec, const Customer &succ){
-
-            return std::max(succ.e, prec.beginTime + Customer::dist(succ, *prec.customer));
-        }
+        
         static inline float newBeginTime(const Customer &prec, const Customer &succ, const float beginTimePrec){
 
             return std::max(succ.e, beginTimePrec + Customer::dist(succ, prec));
