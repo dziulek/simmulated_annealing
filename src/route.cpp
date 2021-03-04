@@ -15,7 +15,7 @@ float Route::calcWaitingTime(const routeCustomer &prec, const Customer &succ){
     return std::max(0.0f, succ.e - arrival);
 }
 
-bool Route::checkIfPossiblePushRoute(const Route &r, const unsigned int _i, float &routeOffsetIn, float &routeOffsetOut){
+bool Route::checkIfPossiblePushRoute(Route &r, const unsigned int _i, float &routeOffsetIn, float &routeOffsetOut){
 
     if( abs(routeOffsetIn) <= eps){
 
@@ -59,8 +59,6 @@ bool Route::checkIfPossiblePushRoute(const Route &r, const unsigned int _i, floa
 
 }
 
-
-
 bool Route::appendCustomer(Customer &c){
 
     float d = this->route.back().distance + Customer::dist(c, *route.back().customer);
@@ -68,12 +66,23 @@ bool Route::appendCustomer(Customer &c){
 
     float wTime = calcWaitingTime(this->route.back(), c);
 
+    if(b > c.l){
+        
+        throw WindowConstraintException(c.l, b, &c);
+    }
+
+    if(this->totalCapacity + c.q > MAX_CAPACITY){
+        
+        throw CapacityException(MAX_CAPACITY, &c, totalCapacity);
+    }
+    this->totalCapacity += c.q;
+
     this->route.push_back({&c, b, d, wTime});
 
     return true;
 }
 
-const routeCustomer & Route::operator[](std::size_t _i) const {
+routeCustomer & Route::operator[](std::size_t _i){
 
     return this->route[_i];
 }
@@ -88,6 +97,11 @@ const routeCustomer & Route::operator>=(const Route & r){
 
 bool Route::insertCustomerIntoRoute(Customer &c, const unsigned int i){
 
+    if(c.q + this->totalCapacity > MAX_CAPACITY){
+        
+        throw CapacityException(MAX_CAPACITY, &c, this->totalCapacity);
+    }
+
     float newbtime = newBeginTime(this->route[i], c);
     float newDistanceForCustomer = this->route[i].distance + Customer::dist(*this->route[i].customer, c);
     
@@ -98,21 +112,26 @@ bool Route::insertCustomerIntoRoute(Customer &c, const unsigned int i){
 
     this->route.insert(this->route.begin() + i, {&c, newbtime, newDistanceForCustomer});
 
-    this->route[i + 1].beginTime = newBeginTime(i + 1);
-
-    float pushCustomers = this->route[i + 1].beginTime - this->route[i].beginTime;
+    float pushCustomers = newBeginTime(i + 1) - this->route[i + 1].beginTime;
 
     this->route[i + 1].waitingTime = calcWaitingTime(i + 1);
 
     for(int j = i + 1; j < this->route.size() - 1; j++){
 
-        this->route[j].beginTime = newBeginTime(j);
+        this->route[j].beginTime += pushCustomers;
+        if(this->route[j].beginTime > this->route[j].customer->l){
+            
+            throw WindowConstraintException(this->route[j].customer->l, this->route[j].beginTime, this->route[j].customer);
+        }
+        if(abs(pushCustomers) < eps)
+            break;//nothing to do
+
         this->route[j].distance += distanceDiff;
 
         float temp = pushCustomers;
 
         pushCustomers = std::max(0.0f, pushCustomers - this->route[j + 1].waitingTime);
-        route[j + 1].waitingTime = std::max(0.0f, route[j + 1].waitingTime - pushCustomers);
+        route[j + 1].waitingTime = std::max(0.0f, route[j + 1].waitingTime - temp);
     }
 
     this->route.back().beginTime += pushCustomers;
@@ -121,7 +140,42 @@ bool Route::insertCustomerIntoRoute(Customer &c, const unsigned int i){
     return true;
 }
 
-bool Route::checkIfPossibleDeleteInsert(const Route &r1, const unsigned int _i, const Route &r2, const unsigned int _j, routeImprovement &score){
+bool Route::deleteCustomer(const unsigned int _i){
+  
+    this->totalCapacity -= this->route[_i].customer->q;
+
+    float diffDistance = Customer::dist(*this->route[_i - 1].customer, *this->route[_i + 1].customer) -
+                        (this->route[_i + 1].distance - this->route[_i -1].distance);
+    
+    this->route.erase(route.begin() + _i);
+    float pushBack = newBeginTime(_i) - this->route[_i].beginTime;
+
+    this->route[_i].waitingTime = calcWaitingTime(_i);
+
+    //slow naive version
+    for(int i = _i; i < route.size() - 1; i++){
+
+        this->route[i].distance += diffDistance;
+        this->route[i].beginTime += pushBack;
+
+        if(abs(pushBack) < eps)
+            break;
+
+        float temp = pushBack;
+
+        pushBack = std::max(0.0f, pushBack - this->route[i + 1].waitingTime);
+        this->route[i + 1].waitingTime = std::max(0.0f, this->route[i+ 1].waitingTime - pushBack);
+
+    }
+
+    this->route.back().beginTime += pushBack;
+    this->route.back().distance += diffDistance;
+
+    return true;
+    
+}
+
+bool Route::checkIfPossibleDeleteInsert(Route &r1, const unsigned int _i, Route &r2, const unsigned int _j, routeImprovement &score){
 
     if(r1[_i].customer->id == 0) return 0;
     if( int(r2.getRemainingCapacity()) == 0 ) return 0;
@@ -157,7 +211,7 @@ bool Route::checkIfPossibleDeleteInsert(const Route &r1, const unsigned int _i, 
     return 0;
 }
 
-bool Route::checkIfPossibleSwapBetweenRoutes(const Route &r1, const unsigned int _i, const Route &r2, const unsigned int _j, routeImprovement &score){
+bool Route::checkIfPossibleSwapBetweenRoutes(Route &r1, const unsigned int _i, Route &r2, const unsigned int _j, routeImprovement &score){
 
     if(r1[_i].customer->id == 0 || r2[_j].customer->id == 0) return 0;
 
@@ -201,8 +255,46 @@ bool Route::checkIfPossibleSwapBetweenRoutes(const Route &r1, const unsigned int
     return 0;
 }
 
-bool Route::execDeleteInsert(const Route &r1, const unsigned int _i, const Route &r2, const unsigned int _j){
+bool Route::execDeleteInsert(Route &r1, const unsigned int _i, Route &r2, const unsigned int _j){
 
+    try{
+        r2.insertCustomerIntoRoute(*r1[_i].customer, _j);
+
+    }catch(const std::exception & e){
+        
+        std::cout << e.what() << std::endl;
+        return false;
+    }
+
+    r1.deleteCustomer(_i);
+
+    return true;
+}
+
+bool Route::execSwapBetweenRoutes(Route &r1, const unsigned int _i, Route &r2, const unsigned int _j){
+
+    Customer * c1 = r1[_i].customer;
+    Customer * c2 = r2[_j].customer;
+
+    r1.deleteCustomer(_i);
+    r2.deleteCustomer(_j);
+
+    try
+    {
+        r1.insertCustomerIntoRoute(*c2, _i);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+        return false;
+    }
     
+    try{
+        r2.insertCustomerIntoRoute(*c1, _j);
+    }
+    catch(const std::exception & e){
+        
+        std::cout << e.what() << std::endl;
+    }
 }
 
