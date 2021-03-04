@@ -60,11 +60,13 @@ bool Route::appendCustomer(Customer &c){
     float wTime = calcWaitingTime(this->route.back(), c);
 
     if(b > c.l){
-        //throw exception
+        
+        throw WindowConstraintException(c.l, b, &c);
     }
 
     if(this->totalCapacity + c.q > MAX_CAPACITY){
-        //throw exception
+        
+        throw CapacityException(MAX_CAPACITY, &c, totalCapacity);
     }
     this->totalCapacity += c.q;
 
@@ -89,7 +91,8 @@ const routeCustomer & Route::operator>=(const Route & r){
 bool Route::insertCustomerIntoRoute(Customer &c, const unsigned int i){
 
     if(c.q + this->totalCapacity > MAX_CAPACITY){
-        //throw exception
+        
+        throw CapacityException(MAX_CAPACITY, &c, this->totalCapacity);
     }
 
     float newbtime = newBeginTime(this->route[i], c);
@@ -110,7 +113,8 @@ bool Route::insertCustomerIntoRoute(Customer &c, const unsigned int i){
 
         this->route[j].beginTime += pushCustomers;
         if(this->route[j].beginTime > this->route[j].customer->l){
-            //throw exception
+            
+            throw WindowConstraintException(this->route[j].customer->l, this->route[j].beginTime, this->route[j].customer);
         }
         if(abs(pushCustomers) < eps)
             break;//nothing to do
