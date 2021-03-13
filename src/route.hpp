@@ -38,16 +38,16 @@ class Route{
         inline float newBeginTime(const unsigned int i){
 
             return std::max(this->route[i].customer->e,
-                            this->route[i - 1].beginTime + Customer::dist(*route[i - 1].customer, *route[i].customer));
+                            this->route[i - 1].beginTime + Customer::dist(*route[i - 1].customer, *route[i].customer) + this->route[i -1].customer->d);
         }
         static inline float newBeginTime(const routeCustomer &prec, const Customer &succ){
 
-            return std::max(succ.e, prec.beginTime + Customer::dist(succ, *prec.customer));
+            return std::max(succ.e, prec.beginTime + Customer::dist(succ, *prec.customer) + prec.customer->d);
         }
         
         static inline float newBeginTime(const Customer &prec, const Customer &succ, const float beginTimePrec){
 
-            return std::max(succ.e, beginTimePrec + Customer::dist(succ, prec));
+            return std::max(succ.e, beginTimePrec + Customer::dist(succ, prec) + prec.d);
         }
         float calcWaitingTime(const unsigned int i);
         float calcWaitingTime(const routeCustomer &prec, const Customer &succ);
@@ -62,7 +62,15 @@ class Route{
 
     public:
 
-        Route(float max_c) : MAX_CAPACITY(max_c){}
+        Route(float max_c) : MAX_CAPACITY(max_c){
+
+            Customer * cust = new Customer(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            this->route.push_back(routeCustomer{cust, 0.0f, 0.0f, 0.0f});
+
+            this->totalRouteCost = 0;
+            this->totalTimeCost = 0;
+            this->totalCapacity = 0;
+        }
 
         routeCustomer & operator[](std::size_t _i);
         const routeCustomer & operator<=(const Route & r);
