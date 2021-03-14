@@ -25,6 +25,11 @@ private:
 
 public:
 
+    CRPTW_Solution(){
+        nOfRoutes = 0;
+        totalDistance = 0.0f;
+        totalTime = 0.0f;
+    }
     CRPTW_Solution(ProviderInfo & provInfo){
 
         this->providerInfo = &provInfo;
