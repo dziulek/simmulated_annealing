@@ -63,3 +63,10 @@ TEST_F(routeTestFixture, time_test){
         ASSERT_FLOAT_EQ(float((i - 1) * (SERVICE_TIME + 1) + 1), (*sample_route)[i].beginTime);
     }
 }
+
+TEST_F(routeTestFixture, waiting_time){
+
+    for(int i = 1; i < sample_route->getSizeOfroute(); i++){
+        ASSERT_FLOAT_EQ(0.0f, (*sample_route)[i].waitingTime);
+    }
+}

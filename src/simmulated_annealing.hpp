@@ -6,6 +6,7 @@
 #include "solution.hpp"
 #include <vector>
 #include <string>
+#include <algorithm>
 
 class SimmulatedAnnealing {
 
@@ -13,6 +14,10 @@ private:
 
     CRPTW_Solution * solution;
     std::vector<Customer> customers;
+
+    ProviderInfo * providerInfo;
+
+    CRPTW_Solution & greedy_init_alg();
 
 public:
 
