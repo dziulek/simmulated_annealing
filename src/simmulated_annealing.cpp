@@ -4,11 +4,14 @@
 //the simplest algorithm for finding initial solution for the problem
 CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
 
+    //clear current solution
+    //to do
+
     if(customers.size() == 0){
         //throw exception
         //to do
     }
-    
+
 
     //check basic constraints and feasibility of customers/data
     //to do
@@ -20,8 +23,7 @@ CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
         cust_to_visit.push_back(&customer);
     }
 
-    CRPTW_Solution solved_routing;
-    Route * current_route = &solved_routing.addRoute();
+    Route * current_route = &solution->addRoute();
 
     while(n_remain > 0){
         
@@ -47,10 +49,10 @@ CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
 
         if (picked == false){
 
-            current_route = &solved_routing.addRoute();
+            current_route = &solution->addRoute();
         }
         
     }
 
-    return solved_routing;
+    return *solution;
 }

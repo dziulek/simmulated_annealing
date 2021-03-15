@@ -8,8 +8,12 @@ Route & CRPTW_Solution::getRoute(unsigned int i){
 
 Route & CRPTW_Solution::addRoute(){
 
-    this->routes.emplace_back(this->providerInfo->truck_capacity);
+    Route * route = new Route(this->providerInfo->truck_capacity);
+    std::unique_ptr<Route> temp_ptr = std::make_unique<Route>(*route);
+    this->routes.push_back(std::move(temp_ptr));
     this->nOfRoutes++;
+
+    return *route;
 }
 
 void CRPTW_Solution::deleteRoute(unsigned int i){
