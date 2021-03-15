@@ -8,6 +8,7 @@ CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
         //throw exception
         //to do
     }
+    
 
     //check basic constraints and feasibility of customers/data
     //to do
