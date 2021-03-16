@@ -8,6 +8,7 @@
 
 struct ProviderInfo{
 
+    unsigned int vehicle_number;
     float warehouse_x;
     float warehouse_y;
     float truck_capacity;
@@ -47,6 +48,8 @@ public:
     float getTotalDistance();
     float getTotalTime();
     unsigned int getNOfRoutes();
+
+    void clearSolution();
 
 };
 

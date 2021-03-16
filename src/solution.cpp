@@ -57,3 +57,9 @@ unsigned int CRPTW_Solution::getNOfRoutes(){
 
     return this->nOfRoutes;
 }
+
+void CRPTW_Solution::clearSolution(){
+
+    this->routes.clear();
+    this->routes.shrink_to_fit();
+}

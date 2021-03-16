@@ -7,6 +7,8 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <iostream>
+#include <fstream>
 
 class SimmulatedAnnealing {
 
@@ -16,6 +18,7 @@ private:
     std::vector<Customer> customers;
 
     ProviderInfo * providerInfo;
+    std::string dataSetName;
 
     CRPTW_Solution & greedy_init_alg();
 
@@ -26,8 +29,12 @@ public:
     }
     virtual ~SimmulatedAnnealing(){}
 
-    int parseDataFromFile(const std::fstream & file) const;
+    int parseDataFromFile(std::string fileName);
     CRPTW_Solution & findInitSolution(std::string alg_name);
+
+    Customer & getCustomer(unsigned int index);
+    ProviderInfo & getProviderInfo();
+    unsigned int getCustomerNumber();
 
 };
 
