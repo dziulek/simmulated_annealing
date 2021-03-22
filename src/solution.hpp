@@ -6,15 +6,6 @@
 #include <vector>
 #include <memory>
 
-struct ProviderInfo{
-
-    unsigned int vehicle_number;
-    float warehouse_x;
-    float warehouse_y;
-    float truck_capacity;
-    float due_date;
-};
-
 class CRPTW_Solution{
 
 private:
@@ -28,6 +19,7 @@ private:
 public:
 
     CRPTW_Solution(){
+
         nOfRoutes = 0;
         totalDistance = 0.0f;
         totalTime = 0.0f;
@@ -39,7 +31,9 @@ public:
         totalDistance = 0.0f;
         totalTime = 0.0f;
     }
-    virtual ~CRPTW_Solution(){}
+    virtual ~CRPTW_Solution(){
+        
+    }
 
     Route & getRoute(unsigned int i);
     Route & addRoute();
@@ -51,6 +45,7 @@ public:
     unsigned int getNOfRoutes();
 
     void clearSolution();
+    void addProviderInfo(ProviderInfo & provInfo);
 
 };
 

@@ -13,8 +13,10 @@ class routeTestFixture : public ::testing::Test{
 public:
     
     routeTestFixture(){
+
         //initialization
-        sample_route = new Route(MAX_CAPACITY);
+        provInfo = new ProviderInfo{0, 0, 0, 10, 10};
+        sample_route = new Route(*provInfo);
 
         for(int i = 0; i < 5; i ++){
 
@@ -40,13 +42,15 @@ public:
     }
 
     virtual ~routeTestFixture(){
-        for(int i = 0; i < sample_route->getSizeOfroute(); i++){
+        for(int i = 1; i < sample_route->getSizeOfroute(); i++){
             delete (*sample_route)[i].customer;
         }
         delete sample_route;
+        delete provInfo;
     }
 
     Route * sample_route;
+    ProviderInfo * provInfo;
 
 };
 

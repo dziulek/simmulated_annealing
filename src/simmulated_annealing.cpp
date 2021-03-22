@@ -1,6 +1,20 @@
 #include "simmulated_annealing.hpp"
 
 
+CRPTW_Solution & SimmulatedAnnealing::findInitSolution(const char* alg_name){
+    if(customers.size() == 0){
+        //to do
+        //throw exception
+    }
+    if(providerInfo == nullptr){
+        //to do
+        //throw exception
+    }
+    //to do -> implementation of more algorithms
+
+    return greedy_init_alg();
+}
+
 //the simplest algorithm for finding initial solution for the problem
 CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
 
@@ -12,7 +26,6 @@ CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
         //to do
     }
 
-
     //check basic constraints and feasibility of customers/data
     //to do
     std::vector<bool> visited_customers(0, customers.size());
@@ -22,9 +35,8 @@ CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
     for(auto & customer : customers){
         cust_to_visit.push_back(&customer);
     }
-
     Route * current_route = &solution->addRoute();
-
+    
     while(n_remain > 0){
         
         int n = current_route->getSizeOfroute();
@@ -34,13 +46,18 @@ CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
                                 current_route->newBeginTime((*current_route)[n - 1], *c2);
         });
 
+        
+
         bool picked = false;
 
         for(auto & customer : cust_to_visit){
 
-            if(customer->l >= current_route->newBeginTime((*current_route)[n - 1], *customer)){
+            if(customer->l + eps >= current_route->newBeginTime((*current_route)[n - 1], *customer) 
+                            && current_route->getRemainingCapacity() + eps >= customer->q){
                 
                 current_route->appendCustomer(*customer);
+                customer = std::move(cust_to_visit.back());
+                cust_to_visit.pop_back();
                 n_remain --;
                 picked = true;
                 break;
@@ -100,6 +117,8 @@ int SimmulatedAnnealing::parseDataFromFile(std::string fileName){
     int it;
     std::vector<float> words(7);
     while(getline(input, line)){
+        if(line.length() == 0)
+            continue;
         it = 0;
         word_num = 0;
         while(it < line.length()){
@@ -120,8 +139,11 @@ int SimmulatedAnnealing::parseDataFromFile(std::string fileName){
             customers.emplace_back((int)words[0], words[1], words[2], words[3], words[4], words[5], words[6]);
         }
     }
-
+    if(this->providerInfo != nullptr)
+        delete this->providerInfo;
     this->providerInfo = temp_prov_info;
+
+    this->solution->addProviderInfo(*this->providerInfo);
 
     input.close();
 

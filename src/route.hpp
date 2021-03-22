@@ -8,6 +8,15 @@
 #include <algorithm>
 #include <cmath>
 
+struct ProviderInfo{
+
+    unsigned int vehicle_number;
+    float warehouse_x;
+    float warehouse_y;
+    float truck_capacity;
+    float due_date;
+};
+
 
 struct routeCustomer{
 
@@ -48,14 +57,18 @@ class Route{
 
     public:
 
-        Route(float max_c) : MAX_CAPACITY(max_c){
+        Route(ProviderInfo & pi) : MAX_CAPACITY(pi.truck_capacity){
 
-            Customer * cust = new Customer(0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            Customer * cust = new Customer(0, pi.warehouse_x, pi.warehouse_y, 0.0f, 0.0f, pi.due_date, 0.0f);
             this->route.push_back(routeCustomer{cust, 0.0f, 0.0f, 0.0f});
 
             this->totalRouteCost = 0;
             this->totalTimeCost = 0;
             this->totalCapacity = 0;
+        }
+
+        virtual ~Route(){
+            delete route[0].customer;
         }
 
         routeCustomer & operator[](std::size_t _i);
@@ -79,7 +92,7 @@ class Route{
 
         float getRemainingCapacity() const { return this->MAX_CAPACITY - this->totalCapacity; }
         float getRouteCost() const { return this->totalRouteCost; }
-        float getTimeCost() const { return this->totalTimeCost; }
+        float getTimeCost() const;
         unsigned int getSizeOfroute() const { return this->route.size(); }
 
         bool appendCustomer(Customer &c);

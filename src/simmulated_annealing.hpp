@@ -28,14 +28,17 @@ public:
 
     SimmulatedAnnealing(){
         solution = new CRPTW_Solution();
+        providerInfo = nullptr;
     }
     virtual ~SimmulatedAnnealing(){
-        delete solution;
-        delete providerInfo;
+        if(solution != nullptr)
+            delete solution;
+        if(providerInfo != nullptr)
+            delete providerInfo;
     }
 
     int parseDataFromFile(std::string fileName);
-    CRPTW_Solution & findInitSolution(std::string alg_name);
+    CRPTW_Solution & findInitSolution(const char* alg_name);
 
     Customer & getCustomer(unsigned int index);
     ProviderInfo & getProviderInfo();

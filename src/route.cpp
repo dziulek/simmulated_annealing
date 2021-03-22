@@ -66,12 +66,12 @@ bool Route::appendCustomer(Customer &c){
 
     float wTime = calcWaitingTime(this->route.back(), c);
 
-    if(b > c.l){
+    if(b > c.l + eps){
         
         throw WindowConstraintException(c.l, b, &c);
     }
 
-    if(this->totalCapacity + c.q > MAX_CAPACITY){
+    if(abs(this->totalCapacity + c.q - MAX_CAPACITY) > eps){
         
         throw CapacityException(MAX_CAPACITY, &c, totalCapacity);
     }
@@ -93,6 +93,11 @@ const routeCustomer & Route::operator<=(const Route & r){
 
 const routeCustomer & Route::operator>=(const Route & r){
     //objective function needed
+}
+
+float Route::getTimeCost() const{
+
+    return newBeginTime(this->route.back(), *this->route.front().customer);
 }
 
 bool Route::insertCustomerIntoRoute(Customer &c, const unsigned int i){
