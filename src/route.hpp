@@ -50,7 +50,7 @@ class Route{
 
         Route(float max_c) : MAX_CAPACITY(max_c){
 
-            Customer * cust = new Customer(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            Customer * cust = new Customer(0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
             this->route.push_back(routeCustomer{cust, 0.0f, 0.0f, 0.0f});
 
             this->totalRouteCost = 0;

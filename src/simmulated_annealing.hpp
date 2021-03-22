@@ -22,12 +22,17 @@ private:
 
     CRPTW_Solution & greedy_init_alg();
 
+    std::string stringToLower(std::string & s);
+
 public:
 
     SimmulatedAnnealing(){
         solution = new CRPTW_Solution();
     }
-    virtual ~SimmulatedAnnealing(){}
+    virtual ~SimmulatedAnnealing(){
+        delete solution;
+        delete providerInfo;
+    }
 
     int parseDataFromFile(std::string fileName);
     CRPTW_Solution & findInitSolution(std::string alg_name);

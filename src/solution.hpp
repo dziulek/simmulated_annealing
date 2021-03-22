@@ -12,6 +12,7 @@ struct ProviderInfo{
     float warehouse_x;
     float warehouse_y;
     float truck_capacity;
+    float due_date;
 };
 
 class CRPTW_Solution{

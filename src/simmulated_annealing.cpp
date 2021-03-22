@@ -60,9 +60,10 @@ CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
 int SimmulatedAnnealing::parseDataFromFile(std::string fileName){
 
     std::fstream input;
-    input.open(fileName, std::ios::in);
+    ProviderInfo * temp_prov_info = new ProviderInfo();
+    input.open(fileName.c_str(), std::ios::in);
 
-    if(!input.good()){
+    if(!input.is_open()){
 
         std::cout << "Błąd otwarcia pliku\n";
         return -1;
@@ -70,42 +71,57 @@ int SimmulatedAnnealing::parseDataFromFile(std::string fileName){
     //clear current dataset and solution
     this->customers.clear();
     this->customers.shrink_to_fit();
+    if(solution == nullptr){
+        this->solution = new CRPTW_Solution();
+    }
     this->solution->clearSolution();
 
+    enum State{DATASETANAME, CUSTOMER, VEHICLE};
+    State state = DATASETANAME;
+    std::string line, temp;
+
     input >> this->dataSetName;
-    
-    std::string helper;
-
-    input >> helper >> helper >> helper;
-
-    ProviderInfo temp_prov_info;
-
-    input >> temp_prov_info.vehicle_number >> temp_prov_info.truck_capacity;
-
-    input >> helper;
-
-    getline(input, helper);
-
-    Customer temp_cust(0, 0, 0, 0, 0, 0);
-
-    while(!input.eof()){
-
-        input >> temp_cust.id;
-        input >> temp_cust.x;
-        input >> temp_cust.y;
-        input >> temp_cust.q;
-        input >> temp_cust.e;
-        input >> temp_cust.l;
-        input >> temp_cust.d;
-
-        this->customers.push_back(temp_cust);
+    input >> temp;
+    if(stringToLower(temp) != "vehicle"){
+        //to do
+        std::cout << temp << std::endl;
+        return -1;
+    }
+    input >> temp >> temp;
+    input >> temp_prov_info->vehicle_number >> temp_prov_info->truck_capacity;
+    input >> temp;
+    if(stringToLower(temp) != "customer"){
+        //to do 
+        return -1;
+    }
+    getline(input, temp);
+    getline(input, temp);
+    int word_num;
+    int it;
+    std::vector<float> words(7);
+    while(getline(input, line)){
+        it = 0;
+        word_num = 0;
+        while(it < line.length()){
+            if(line[it] == ' ' || line[it] == '\t'){
+                it ++;continue;
+            }
+            int next_space = line.find_first_of(" \t", it);
+            words[word_num] = std::stof(line.substr(it, next_space - it));
+            it = next_space;
+            word_num++;
+        }
+        if(words[0] == 0){//its magazine
+            temp_prov_info->warehouse_x = words[1];
+            temp_prov_info->warehouse_y = words[2];
+            temp_prov_info->due_date = words[5];
+        }
+        else {
+            customers.emplace_back((int)words[0], words[1], words[2], words[3], words[4], words[5], words[6]);
+        }
     }
 
-    //ugly check for now
-    if(customers.back().id == customers[customers.size() - 2].id){
-
-        this->customers.pop_back();
-    }
+    this->providerInfo = temp_prov_info;
 
     input.close();
 
@@ -129,4 +145,11 @@ ProviderInfo & SimmulatedAnnealing::getProviderInfo(){
 unsigned int SimmulatedAnnealing::getCustomerNumber(){
 
     return this->customers.size();
+}
+
+std::string SimmulatedAnnealing::stringToLower(std::string & s){
+    std::string out = s;
+    std::transform(out.begin(), out.end(), out.begin(),
+    [](unsigned char c){ return std::tolower(c); });
+    return out;
 }

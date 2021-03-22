@@ -18,7 +18,7 @@ public:
 
         for(int i = 0; i < 5; i ++){
 
-            Customer * customer = new Customer(float(i + 1), 0.0f, DEMAND, OPEN_WINDOW, CLOSE_WINDOW, SERVICE_TIME);
+            Customer * customer = new Customer(i, float(i + 1), 0.0f, DEMAND, OPEN_WINDOW, CLOSE_WINDOW, SERVICE_TIME);
             this->sample_route->appendCustomer(*customer);
         }
     }

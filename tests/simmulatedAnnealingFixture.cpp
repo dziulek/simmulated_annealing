@@ -33,5 +33,6 @@ TEST_F(SimmulatedAnnealingFixture, parse_from_file){
     ASSERT_FLOAT_EQ(simmulatedAnnealing->getProviderInfo().vehicle_number, 10.0f);
     ASSERT_FLOAT_EQ(simmulatedAnnealing->getProviderInfo().truck_capacity, 10.0f);
 
-    ASSERT_FLOAT_EQ(simmulatedAnnealing->getCustomerNumber(), 4);
+    ASSERT_FLOAT_EQ(simmulatedAnnealing->getCustomerNumber(), 3);
+    ASSERT_FLOAT_EQ(simmulatedAnnealing->getProviderInfo().due_date, 100.0f);
 }
