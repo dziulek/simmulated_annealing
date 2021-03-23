@@ -20,7 +20,7 @@ public:
 
         for(int i = 0; i < 5; i ++){
 
-            Customer * customer = new Customer(i, float(i + 1), 0.0f, DEMAND, OPEN_WINDOW, CLOSE_WINDOW, SERVICE_TIME);
+            Customer * customer = new Customer(i + 1, float(i + 1), 0.0f, DEMAND, OPEN_WINDOW, CLOSE_WINDOW, SERVICE_TIME);
             this->sample_route->appendCustomer(*customer);
         }
     }
@@ -57,20 +57,20 @@ public:
 TEST_F(routeTestFixture, distance_test){
 
     for(int i = 0; i < sample_route->getSizeOfroute(); i++){
-        ASSERT_FLOAT_EQ(float(i), (*sample_route)[i].distance);
+        ASSERT_FLOAT_EQ(float(i + 1), (*sample_route)[i].distance);
     }
 }
 
 TEST_F(routeTestFixture, time_test){
 
-    for(int i = 1; i < sample_route->getSizeOfroute(); i++){
-        ASSERT_FLOAT_EQ(float((i - 1) * (SERVICE_TIME + 1) + 1), (*sample_route)[i].beginTime);
+    for(int i = 0; i < sample_route->getSizeOfroute(); i++){
+        ASSERT_FLOAT_EQ(float((i) * (SERVICE_TIME + 1) + 1), (*sample_route)[i].beginTime);
     }
 }
 
 TEST_F(routeTestFixture, waiting_time){
 
-    for(int i = 1; i < sample_route->getSizeOfroute(); i++){
+    for(int i = 0; i < sample_route->getSizeOfroute(); i++){
         ASSERT_FLOAT_EQ(0.0f, (*sample_route)[i].waitingTime);
     }
 }

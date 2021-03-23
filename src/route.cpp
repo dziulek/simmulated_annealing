@@ -59,6 +59,16 @@ bool Route::checkIfPossiblePushRoute(Route &r, const unsigned int _i, float &rou
 
 }
 
+bool Route::checkIfCanReturnInTime(){
+
+    float b = this->newBeginTime(this->route.back(), *route[0].customer);
+
+    if(b > route[0].customer->l + eps)
+        return false;
+
+    return true;
+}
+
 bool Route::appendCustomer(Customer &c){
 
     float d = this->route.back().distance + Customer::dist(c, *route.back().customer);
@@ -71,10 +81,15 @@ bool Route::appendCustomer(Customer &c){
         throw WindowConstraintException(c.l, b, &c);
     }
 
-    if(abs(this->totalCapacity + c.q - MAX_CAPACITY) > eps){
+    if(this->totalCapacity + c.q > eps + MAX_CAPACITY){
         
         throw CapacityException(MAX_CAPACITY, &c, totalCapacity);
     }
+
+    if(!checkIfCanReturnInTime())
+        return false;
+
+
     this->totalCapacity += c.q;
 
     this->route.push_back({&c, b, d, wTime});
@@ -84,7 +99,10 @@ bool Route::appendCustomer(Customer &c){
 
 routeCustomer & Route::operator[](std::size_t _i){
 
-    return this->route[_i];
+    if(_i < 0 || _i > route.size() - 2){
+        throw std::out_of_range("Try to access route customer at index " + std::to_string(_i) + ",\nsize of route: " + std::to_string(this->route.size()));
+    }
+    return this->route[_i + 1];
 }
 
 const routeCustomer & Route::operator<=(const Route & r){

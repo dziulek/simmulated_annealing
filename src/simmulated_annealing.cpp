@@ -55,7 +55,9 @@ CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
             if(customer->l + eps >= current_route->newBeginTime((*current_route)[n - 1], *customer) 
                             && current_route->getRemainingCapacity() + eps >= customer->q){
                 
-                current_route->appendCustomer(*customer);
+                bool b = current_route->appendCustomer(*customer);
+                if(b == false)
+                    continue;
                 customer = std::move(cust_to_visit.back());
                 cust_to_visit.pop_back();
                 n_remain --;

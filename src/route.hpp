@@ -54,6 +54,7 @@ class Route{
                 /////////value by which the route was moved in time due to insertion
                 /////////positive value means extension of a route, negative value implies shorten of a route
         bool execInsertion();
+        bool checkIfCanReturnInTime();
 
     public:
 
@@ -93,7 +94,7 @@ class Route{
         float getRemainingCapacity() const { return this->MAX_CAPACITY - this->totalCapacity; }
         float getRouteCost() const { return this->totalRouteCost; }
         float getTimeCost() const;
-        unsigned int getSizeOfroute() const { return this->route.size(); }
+        unsigned int getSizeOfroute() const { return this->route.size() - 1; }
 
         bool appendCustomer(Customer &c);
         bool insertCustomerIntoRoute(Customer &c, const unsigned int i);
