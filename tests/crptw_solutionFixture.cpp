@@ -20,6 +20,16 @@ public:
     
 };
 
+TEST_F(CRPTW_SolutionFixture, copy_constructor){
+
+    CRPTW_Solution temp_solution =  *solution;
+
+    temp_solution.addRoute();
+    ASSERT_EQ(solution->getNOfRoutes(), 0);
+    ASSERT_EQ(temp_solution.getNOfRoutes(), 1);
+    //to do check if temp_solution is deep copy of solution
+}
+
 TEST_F(CRPTW_SolutionFixture, add_delete_route){
 
     solution->addRoute();

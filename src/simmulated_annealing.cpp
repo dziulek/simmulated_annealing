@@ -177,3 +177,26 @@ std::string SimmulatedAnnealing::stringToLower(std::string & s){
     [](unsigned char c){ return std::tolower(c); });
     return out;
 }
+
+CRPTW_Solution & SimmulatedAnnealing::runAlgorithm(std::string initAlg){
+
+    //check if all resources have been loaded
+    if(customers.size() == 0){
+        //to do
+    }
+    if(providerInfo == nullptr){
+        //to do
+    }
+
+    //clear previous output
+    if(this->solution != nullptr){
+        delete this->solution;
+    }
+
+    this->solution = new CRPTW_Solution(*this->providerInfo);
+    this->solution = &greedy_init_alg();
+
+
+
+    return *this->solution;
+}

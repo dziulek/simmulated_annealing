@@ -39,6 +39,7 @@ public:
 
     int parseDataFromFile(std::string fileName);
     CRPTW_Solution & findInitSolution(const char* alg_name);
+    CRPTW_Solution & runAlgorithm(std::string initAlg="greedy");
 
     Customer & getCustomer(unsigned int index);
     ProviderInfo & getProviderInfo();

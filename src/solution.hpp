@@ -15,6 +15,8 @@ private:
     float totalDistance;
     float totalTime;
     ProviderInfo * providerInfo;
+    
+    
 
 public:
 
@@ -35,6 +37,37 @@ public:
         
     }
 
+    bool operator<(CRPTW_Solution & solution);
+    bool operator>(CRPTW_Solution & solution);
+
+    CRPTW_Solution(const CRPTW_Solution & solution){
+        
+        if(this->providerInfo != nullptr)
+            this->providerInfo = new ProviderInfo{
+                
+                solution.providerInfo->vehicle_number,
+                solution.providerInfo->warehouse_x,
+                solution.providerInfo->warehouse_y,                
+                solution.providerInfo->truck_capacity,
+                solution.providerInfo->due_date               
+            };
+
+        this->providerInfo->due_date = solution.providerInfo->due_date;
+
+        this->routes.clear();
+        this->routes.shrink_to_fit();
+        for(auto & route : solution.routes){
+            
+            Route * new_route = new Route(*this->providerInfo);
+            *new_route = *route.get();//copy constructor of route class
+            this->routes.push_back(std::move(std::make_unique<Route>(*new_route)));
+        }
+        //other field
+        this->nOfRoutes = solution.nOfRoutes;
+        this->totalDistance = solution.totalDistance;
+        this->totalTime = solution.totalTime;
+    }
+
     Route & getRoute(unsigned int i);
     Route & addRoute();
     Route & addRoute(const Route & route);
@@ -47,6 +80,7 @@ public:
     void clearSolution();
     void addProviderInfo(ProviderInfo & provInfo);
 
+    float objectiveFunction(float route_coeff=1000.0f, float distance_coeff=100.0f, float time_coeff=100.f);
 };
 
 #endif

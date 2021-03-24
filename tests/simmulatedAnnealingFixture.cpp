@@ -2,6 +2,7 @@
 #include "../src/simmulated_annealing.hpp"
 #include <iostream>
 #include <cmath>
+#include <unistd.h>
 
 class SimmulatedAnnealingFixture : public ::testing::Test{
 
@@ -27,7 +28,11 @@ TEST_F(SimmulatedAnnealingFixture, parse_from_file){
 
     ASSERT_EQ(b, -1);
 
+    char directory[FILENAME_MAX];
+    getcwd(directory, FILENAME_MAX);
+
     b = simmulatedAnnealing->parseDataFromFile("../tests/testDataFiles/cvrptw4.txt");
+    // std::cerr << std::string(directory) << std::endl;
 
     ASSERT_EQ(b, 1);
     ASSERT_FLOAT_EQ(simmulatedAnnealing->getProviderInfo().vehicle_number, 10.0f);

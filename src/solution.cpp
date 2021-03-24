@@ -28,6 +28,21 @@ void CRPTW_Solution::deleteRoute(unsigned int i){
     this->routes[i] = std::move(this->routes.back());
 }
 
+bool CRPTW_Solution::operator<(CRPTW_Solution & solution){
+
+    return this->objectiveFunction() < solution.objectiveFunction();
+}
+
+bool CRPTW_Solution::operator>(CRPTW_Solution & solution){
+
+    return this->objectiveFunction() > solution.objectiveFunction();
+}
+
+float CRPTW_Solution::objectiveFunction(float route_coeff, float distance_coeff, float time_coeff){
+
+    return this->routes.size() * route_coeff + this->getTotalDistance() * distance_coeff + this->getTotalTime() * time_coeff;
+}
+
 float CRPTW_Solution::getTotalDistance(){
     
     float sum = 0;
@@ -62,6 +77,10 @@ void CRPTW_Solution::clearSolution(){
 
     this->routes.clear();
     this->routes.shrink_to_fit();
+
+    this->nOfRoutes=0;
+    this->totalDistance=0;
+    this->totalTime=0;
 }
 
 void CRPTW_Solution::addProviderInfo(ProviderInfo & provInfo){
