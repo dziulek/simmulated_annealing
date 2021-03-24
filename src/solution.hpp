@@ -44,7 +44,7 @@ public:
         
         if(this->providerInfo != nullptr)
             this->providerInfo = new ProviderInfo{
-                
+
                 solution.providerInfo->vehicle_number,
                 solution.providerInfo->warehouse_x,
                 solution.providerInfo->warehouse_y,                

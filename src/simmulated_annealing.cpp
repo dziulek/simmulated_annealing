@@ -196,7 +196,65 @@ CRPTW_Solution & SimmulatedAnnealing::runAlgorithm(std::string initAlg){
     this->solution = new CRPTW_Solution(*this->providerInfo);
     this->solution = &greedy_init_alg();
 
+    CRPTW_Solution * current_solution = this->solution;
 
+    CRPTW_Solution bestSolution = *current_solution;
+
+    int random_iterations = 0;
+    int continuous_overlap = 0;
+    float delta, averageDelta=0.f;
+
+
+    //move_number: if 0 then delete insert is considered, otherwise swap between routes
+    unsigned int move_number, route_i, route_j, cust_i, cust_j;
+
+    routeImprovement routeImprv;
+
+    while(random_iterations < N_RANDOM_ITERATIONS && solution->getNOfRoutes() > 2){
+
+        move_number = rand()%2;
+        route_i = rand()%current_solution->getNOfRoutes();
+        route_j = rand()%current_solution->getNOfRoutes();
+
+        while(route_j == route_i)
+            route_j = rand()%current_solution->getNOfRoutes();
+
+        cust_i = rand()%current_solution->getRoute(route_i).getSizeOfroute();
+        cust_j = rand()%current_solution->getRoute(route_j).getSizeOfroute();
+
+        if(move_number == 0){
+
+            if(Route::checkIfPossibleDeleteInsert(current_solution->getRoute(route_i), cust_i, 
+                                        current_solution->getRoute(route_j), cust_j, routeImprv)){
+                
+                random_iterations++;
+                Route::execDeleteInsert(
+                    current_solution->getRoute(route_i),
+                    cust_i, 
+                    current_solution->getRoute(route_j),
+                    cust_j
+                );
+                delta = routeImprv.objectiveFunction();
+                averageDelta += abs(delta);
+            }
+        }
+        else {
+
+            if(Route::checkIfPossibleSwapBetweenRoutes(
+                current_solution->getRoute(route_i), cust_i,
+                current_solution->getRoute(route_j), cust_j, routeImprv
+            )){
+
+                random_iterations++;
+                Route::execSwapBetweenRoutes(
+                    current_solution->getRoute(route_i), cust_i,
+                    current_solution->getRoute(route_j), cust_j
+                );
+                delta = routeImprv.objectiveFunction();
+                averageDelta += abs(delta);
+            }
+        }
+    }
 
     return *this->solution;
 }

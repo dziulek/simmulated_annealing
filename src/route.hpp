@@ -31,6 +31,11 @@ struct routeImprovement{
     int routeNumber;//if -1 then we have one route less, if 0 nothing changes
     float routeCostDiff;//if less than 0 then improvement is expected
     float routeDistanceDiff;//if less than 0 then imporvement is expected
+
+    float objectiveFunction(float route_coeff=1000.f, float distance_coeff=100.f, float time_coeff=100.0f){
+
+        return routeNumber * route_coeff + distance_coeff * routeCostDiff + time_coeff * routeDistanceDiff;
+    }
 };
 
 
