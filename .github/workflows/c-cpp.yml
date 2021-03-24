@@ -22,5 +22,6 @@ jobs:
         cd build
         make
     - name: Run Test
-      run: /home/runner/work/simmulated_annealing/simmulated_annealing/build/tests/test_run
+      run: |
+        ./tests/test_run
 
