@@ -22,6 +22,6 @@ jobs:
         cd build
         make
     - name: Run Test
-      run: |
-        /home/runner/work/simmulated_annealing/build/tests/test_tst
+      working-directory: ${{runner.workspace}}/build/tests
+      run: ./tests_tst
 
