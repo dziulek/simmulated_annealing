@@ -23,5 +23,5 @@ jobs:
         make
     - name: Run Test
       run: |
-        ./tests/test_run
+        /home/runner/work/simmulated_annealing/build/tests/test_tst
 
