@@ -144,9 +144,7 @@ int SimmulatedAnnealing::parseDataFromFile(std::string fileName){
             temp_prov_info->due_date = words[5];
         }
         else {
-            // std::cerr << words[0] << " " << words[1] << " " << words[2] << " " << words[3] << std::endl;
             customers.emplace_back((int)words[0], words[1], words[2], words[3], words[4], words[5], words[6]);
-            // customers.push_back({(int)words[0], words[1], words[2], words[3], words[4], words[5], words[6]});
         }
     }
     if(this->providerInfo != nullptr)
@@ -292,6 +290,7 @@ bool SimmulatedAnnealing::terminateSearch(){
 bool SimmulatedAnnealing::nextMove(){
 
     float d, p;
+    int moveNumber = 0;
 
     std::vector<int> route1Indexes, route2Indexes;
     route1Indexes.resize(this->solution->getNOfRoutes());
@@ -317,6 +316,16 @@ bool SimmulatedAnnealing::nextMove(){
 
                 for(int custB = 1; custB < solution->getRoute(j).getSizeOfroute() - 1; custB ++){
 
+                    moveNumber = rand()%2;
+                    
+                    if(moveNumber == 0){
+                        //consider delete insert operation
+                        
+                    }
+                    else {
+                        //consider swap operation
+
+                    }
                     //to do
                 }
             }

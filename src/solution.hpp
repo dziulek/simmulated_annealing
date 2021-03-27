@@ -81,6 +81,8 @@ public:
     void addProviderInfo(ProviderInfo & provInfo);
 
     float objectiveFunction(float route_coeff=1000.0f, float distance_coeff=100.0f, float time_coeff=100.f);
+
+    friend class TabuList;
 };
 
 #endif

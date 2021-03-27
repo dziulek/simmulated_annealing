@@ -19,7 +19,7 @@ private:
 
     ProviderInfo * providerInfo;
     std::string dataSetName;
-
+    std::vector<std::vector<int>> tabuList;
 
     //metaheuristic parameters
     float pInit; //initial probability value
