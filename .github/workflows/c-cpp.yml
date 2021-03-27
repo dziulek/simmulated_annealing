@@ -21,7 +21,4 @@ jobs:
       run: |
         cd build
         make
-    - name: Run Test
-      working-directory: ${{runner.workspace}}/build/tests
-      run: ./tests_tst
 
