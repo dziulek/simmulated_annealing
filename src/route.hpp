@@ -48,6 +48,7 @@ class Route{
         float totalTimeCost;
         float totalCapacity;
         float MAX_CAPACITY;
+        Customer * magazine;
 
         float calcWaitingTime(const unsigned int i);
         float calcWaitingTime(const routeCustomer &prec, const Customer &succ);
@@ -65,8 +66,10 @@ class Route{
 
         Route(ProviderInfo & pi) : MAX_CAPACITY(pi.truck_capacity){
 
-            Customer * cust = new Customer(0, pi.warehouse_x, pi.warehouse_y, 0.0f, 0.0f, pi.due_date, 0.0f);
-            this->route.push_back(routeCustomer{cust, 0.0f, 0.0f, 0.0f});
+            magazine = new Customer(0, pi.warehouse_x, pi.warehouse_y, 0.0f, 0.0f, pi.due_date, 0.0f);
+            this->route.push_back({magazine, 0.f, 0.f, 0.f});
+            this->route.push_back({magazine, 0.f, 0.f, 0.f});
+
 
             this->totalRouteCost = 0;
             this->totalTimeCost = 0;
@@ -74,32 +77,22 @@ class Route{
         }
 
         virtual ~Route(){
-            delete route[0].customer;
+            // delete magazine;
         }
 
         routeCustomer & operator[](std::size_t _i);
         const routeCustomer & operator<=(const Route & r);
         const routeCustomer & operator>=(const Route & r);
 
-        inline float newBeginTime(const unsigned int i){
+        float newBeginTime(const unsigned int i);
+        static float newBeginTime(const routeCustomer &prec, const Customer &succ);
+        static float newBeginTime(const Customer &prec, const Customer &succ, const float beginTimePrec);
 
-            return std::max(this->route[i].customer->e,
-                            this->route[i - 1].beginTime + Customer::dist(*route[i - 1].customer, *route[i].customer) + this->route[i -1].customer->d);
-        }
-        static inline float newBeginTime(const routeCustomer &prec, const Customer &succ){
-
-            return std::max(succ.e, prec.beginTime + Customer::dist(succ, *prec.customer) + prec.customer->d);
-        }
-        
-        static inline float newBeginTime(const Customer &prec, const Customer &succ, const float beginTimePrec){
-
-            return std::max(succ.e, beginTimePrec + Customer::dist(succ, prec) + prec.d);
-        }
-
+        routeCustomer & getLastCustomer();
         float getRemainingCapacity() const { return this->MAX_CAPACITY - this->totalCapacity; }
         float getRouteCost() const { return this->totalRouteCost; }
         float getTimeCost() const;
-        unsigned int getSizeOfroute() const { return this->route.size() - 1; }
+        unsigned int getSizeOfroute() const { return this->route.size(); }
 
         bool appendCustomer(Customer &c);
         bool insertCustomerIntoRoute(Customer &c, const unsigned int i);

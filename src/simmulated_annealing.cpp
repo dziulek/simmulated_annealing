@@ -42,8 +42,8 @@ CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
         int n = current_route->getSizeOfroute();
         //search for best fitting customer (beginTime criteria)
         std::sort(cust_to_visit.begin(), cust_to_visit.end(), [&](Customer *c1, Customer *c2){
-            return current_route->newBeginTime((*current_route)[n - 1], *c1) <
-                                current_route->newBeginTime((*current_route)[n - 1], *c2);
+            return current_route->newBeginTime(current_route->getLastCustomer(), *c1) <
+                                current_route->newBeginTime(current_route->getLastCustomer(), *c2);
         });
 
         
@@ -52,17 +52,23 @@ CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
 
         for(auto & customer : cust_to_visit){
 
-            if(customer->l + eps >= current_route->newBeginTime((*current_route)[n - 1], *customer) 
+            if(customer->l + eps >= current_route->newBeginTime(current_route->getLastCustomer(), *customer) 
                             && current_route->getRemainingCapacity() + eps >= customer->q){
-                
-                bool b = current_route->appendCustomer(*customer);
-                if(b == false)
+                bool b;
+                try{
+
+                    b = current_route->appendCustomer(*customer);
+                    customer = std::move(cust_to_visit.back());
+                    cust_to_visit.pop_back();
+                    n_remain --;
+                    picked = true;
+                    break;
+
+                }catch(WindowConstraintException & e){
+
                     continue;
-                customer = std::move(cust_to_visit.back());
-                cust_to_visit.pop_back();
-                n_remain --;
-                picked = true;
-                break;
+                }
+
             }
         }
 
@@ -138,7 +144,9 @@ int SimmulatedAnnealing::parseDataFromFile(std::string fileName){
             temp_prov_info->due_date = words[5];
         }
         else {
+            // std::cerr << words[0] << " " << words[1] << " " << words[2] << " " << words[3] << std::endl;
             customers.emplace_back((int)words[0], words[1], words[2], words[3], words[4], words[5], words[6]);
+            // customers.push_back({(int)words[0], words[1], words[2], words[3], words[4], words[5], words[6]});
         }
     }
     if(this->providerInfo != nullptr)
@@ -219,8 +227,8 @@ CRPTW_Solution & SimmulatedAnnealing::runAlgorithm(std::string initAlg){
         while(route_j == route_i)
             route_j = rand()%current_solution->getNOfRoutes();
 
-        cust_i = rand()%current_solution->getRoute(route_i).getSizeOfroute();
-        cust_j = rand()%current_solution->getRoute(route_j).getSizeOfroute();
+        cust_i = rand()%(current_solution->getRoute(route_i).getSizeOfroute() - 2) + 1;
+        cust_j = rand()%(current_solution->getRoute(route_j).getSizeOfroute() - 2) + 1;
 
         if(move_number == 0){
 
@@ -256,5 +264,67 @@ CRPTW_Solution & SimmulatedAnnealing::runAlgorithm(std::string initAlg){
         }
     }
 
+    if(averageDelta < eps){
+        //pick default value based on some heuristic
+        averageDelta = 1.02;
+    }
+
+    averageDelta /= N_RANDOM_ITERATIONS;
+
+    while(!terminateSearch()){
+
+
+    }
+
     return *this->solution;
+}
+
+void SimmulatedAnnealing::setParams(const float avgCostIncrease){
+
+
+}
+
+bool SimmulatedAnnealing::terminateSearch(){
+
+
+}
+
+bool SimmulatedAnnealing::nextMove(){
+
+    float d, p;
+
+    std::vector<int> route1Indexes, route2Indexes;
+    route1Indexes.resize(this->solution->getNOfRoutes());
+    route2Indexes.resize(this->solution->getNOfRoutes());
+    for(int i = 0; i < this->solution->getNOfRoutes(); i++){
+
+        route1Indexes[i] = i;
+        route2Indexes[i] = i;
+    }
+
+    this->routeRearange(route1Indexes);
+    this->routeRearange(route2Indexes);
+
+    for(auto & i : route1Indexes){
+
+        for(auto & j : route2Indexes){
+
+            //routes have to be different
+            if(i == j)
+                continue;
+            
+            for(int custA = 1; custA < solution->getRoute(i).getSizeOfroute() - 1; custA ++){
+
+                for(int custB = 1; custB < solution->getRoute(j).getSizeOfroute() - 1; custB ++){
+
+                    //to do
+                }
+            }
+        }
+    }
+}
+
+void SimmulatedAnnealing::routeRearange(std::vector<int> & indexes){
+
+    std::random_shuffle(indexes.begin(), indexes.end());
 }

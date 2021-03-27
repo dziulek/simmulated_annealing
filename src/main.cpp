@@ -6,11 +6,12 @@
 
 int main(int argc, char * argv[]){
 
+    srand(time(0));
     SimmulatedAnnealing annealing;
     
-    int e = annealing.parseDataFromFile("../tests/testDataFiles/m2kvrptw-0.txt");
+    int e = annealing.parseDataFromFile("/home/czewian/Dokumenty/simmulated_annealing/tests/testDataFiles/m2kvrptw-0.txt");
     if(e == 1){
-        CRPTW_Solution * solution = &annealing.findInitSolution("cprwt");
+        CRPTW_Solution * solution = &annealing.runAlgorithm();
 
         for(int i = 0; i < solution->getNOfRoutes(); i++){
             for(int j = 0; j < solution->getRoute(i).getSizeOfroute(); j++){

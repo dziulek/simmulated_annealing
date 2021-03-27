@@ -20,7 +20,20 @@ private:
     ProviderInfo * providerInfo;
     std::string dataSetName;
 
+
+    //metaheuristic parameters
+    float pInit; //initial probability value
+    float TEMPINIT; //initial temperature
+    float RATIO;//
+    float epochLen;//length of the epoch
+    float MAX_TIME;//
+    float MIN_PERCENT;
+
     CRPTW_Solution & greedy_init_alg();
+    void setParams(const float avgCostIncrease);
+    bool terminateSearch();
+    bool nextMove();//algorithm for searching next move
+    void routeRearange(std::vector<int> & indexes);
 
     std::string stringToLower(std::string & s);
 
