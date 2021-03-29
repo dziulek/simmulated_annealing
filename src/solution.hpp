@@ -10,7 +10,7 @@ class CRPTW_Solution{
 
 private:
 
-    std::vector<std::unique_ptr<Route>> routes;
+    std::vector<Route *> routes;
     unsigned int nOfRoutes;
     float totalDistance;
     float totalTime;
@@ -35,6 +35,8 @@ public:
     }
     virtual ~CRPTW_Solution(){
         
+        for(auto & route : this->routes)
+            delete route;
     }
 
     bool operator<(CRPTW_Solution & solution);
@@ -54,14 +56,7 @@ public:
 
         this->providerInfo->due_date = solution.providerInfo->due_date;
 
-        this->routes.clear();
-        this->routes.shrink_to_fit();
-        for(auto & route : solution.routes){
-            
-            Route * new_route = new Route(*this->providerInfo);
-            *new_route = *route.get();//copy constructor of route class
-            this->routes.push_back(std::move(std::make_unique<Route>(*new_route)));
-        }
+        this->routes = solution.routes;
         //other field
         this->nOfRoutes = solution.nOfRoutes;
         this->totalDistance = solution.totalDistance;

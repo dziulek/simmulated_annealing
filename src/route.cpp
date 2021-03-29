@@ -250,7 +250,7 @@ bool Route::checkIfPossibleDeleteInsert(Route &r1, const unsigned int _i, Route 
         throw std::invalid_argument("cannot delete magazine from route");
     }
 
-    if( int(r2.getRemainingCapacity()) == 0 ) return 0;
+    if( r2.getRemainingCapacity() - r1[_i].customer->q < eps ) return 0;
 
     float offIn_r1, offOut_r1;
 

@@ -209,6 +209,16 @@ CRPTW_Solution & SimmulatedAnnealing::runAlgorithm(std::string initAlg){
     int random_iterations = 0;
     int continuous_overlap = 0;
     float delta, averageDelta=0.f;
+    int optimumConstCounter = 0, noImprovementIteration = 0;
+    int __counter = 0;
+    float FINDDIVISOR = 500000;
+    float temperature = this->TEMPINIT;
+
+    int moveType;
+
+    int rejectedIterations = 0;
+
+    int custA, custB, routeA, routeB;
 
 
     //move_number: if 0 then delete insert is considered, otherwise swap between routes
@@ -216,7 +226,8 @@ CRPTW_Solution & SimmulatedAnnealing::runAlgorithm(std::string initAlg){
 
     routeImprovement routeImprv;
 
-    while(random_iterations < N_RANDOM_ITERATIONS && solution->getNOfRoutes() > 2){
+    while(continuous_overlap < customers.size() * customers.size() && 
+                    random_iterations < N_RANDOM_ITERATIONS && solution->getNOfRoutes() > 2){
 
         move_number = rand()%2;
         route_i = rand()%current_solution->getNOfRoutes();
@@ -242,7 +253,9 @@ CRPTW_Solution & SimmulatedAnnealing::runAlgorithm(std::string initAlg){
                 );
                 delta = routeImprv.objectiveFunction();
                 averageDelta += abs(delta);
+                continuous_overlap = 0;
             }
+            else continuous_overlap ++;
         }
         else {
 
@@ -258,7 +271,9 @@ CRPTW_Solution & SimmulatedAnnealing::runAlgorithm(std::string initAlg){
                 );
                 delta = routeImprv.objectiveFunction();
                 averageDelta += abs(delta);
+                continuous_overlap = 0;
             }
+            else continuous_overlap ++;
         }
     }
 
@@ -269,17 +284,60 @@ CRPTW_Solution & SimmulatedAnnealing::runAlgorithm(std::string initAlg){
 
     averageDelta /= N_RANDOM_ITERATIONS;
 
-    while(!terminateSearch()){
+    this->setParams(averageDelta);
+    temperature = this->TEMPINIT;
 
+    TabuList tabuList(*current_solution, customers.size());
 
+    while(temperature >= (TEMPINIT / FINDDIVISOR) && solution->getNOfRoutes() > 2){
+
+        while(optimumConstCounter < this->MAX_TIME && __counter * MIN_PERCENT <= (__counter - rejectedIterations) && solution->getNOfRoutes() > 2){
+
+            if(nextMove(custA, routeA, custB, routeB, tabuList, moveType)){
+
+                if(moveType == 0){
+
+                    Route::execDeleteInsert(solution->getRoute(routeA), custA, solution->getRoute(routeB), custB);
+                }
+                else {
+
+                    Route::execSwapBetweenRoutes(solution->getRoute(routeA), custA, solution->getRoute(routeB), custB);
+                }
+
+                //check if found best solution
+                if(solution->objectiveFunction() < bestSolution.objectiveFunction()){
+
+                    bestSolution = *solution;
+                    optimumConstCounter = 0;
+                }
+                else optimumConstCounter ++;
+            }
+            else {
+
+                rejectedIterations ++;
+                optimumConstCounter ++;
+                
+            }
+            __counter ++;
+            tabuList.incrementTime();
+        }
+
+        temperature *= this->RATIO;
+        tabuList.actualizeTabuList();
     }
+    *this->solution = bestSolution;
 
     return *this->solution;
 }
 
 void SimmulatedAnnealing::setParams(const float avgCostIncrease){
-
-
+    
+    this->pInit = 0.95;
+    this->TEMPINIT = -avgCostIncrease / log(this->pInit);
+    this->epochLen = 1e5;
+    this->MIN_PERCENT = 0.01;
+    this->RATIO = 0.95;
+    this->MAX_TIME = 2 * customers.size();
 }
 
 bool SimmulatedAnnealing::terminateSearch(){
@@ -287,10 +345,11 @@ bool SimmulatedAnnealing::terminateSearch(){
 
 }
 
-bool SimmulatedAnnealing::nextMove(){
+bool SimmulatedAnnealing::nextMove(int & __custA, int & __routeA, int & __custB, int & __routeB, TabuList & tabuList, int & moveNumber){
 
     float d, p;
-    int moveNumber = 0;
+    routeImprovement routeImpr;
+    float k1 = 0.3, k2 = 0.3;
 
     std::vector<int> route1Indexes, route2Indexes;
     route1Indexes.resize(this->solution->getNOfRoutes());
@@ -318,22 +377,100 @@ bool SimmulatedAnnealing::nextMove(){
 
                     moveNumber = rand()%2;
                     
+                    __custA = custA;
+                    __custB = custB;
+                    __routeA = i;
+                    __routeB = j;
+
                     if(moveNumber == 0){
                         //consider delete insert operation
-                        
+                        if(Route::checkIfPossibleDeleteInsert(
+                            solution->getRoute(i), custA, solution->getRoute(j), custB, routeImpr
+                        )){
+                            
+                            if(tabuList.isValidMove(custA, i, custB, j)){
+
+                                d = routeImpr.objectiveFunction();
+                                if(d < eps){
+
+                                    tabuList.recordOperation(custA, i, custB, j);
+                                    return true;                                    
+                                }
+                                //give a second chance with some probability 
+                                p = d * (1.f - k1) * (1.f - k2);
+
+                                if(this->probabilityThreshold() > p){
+
+                                    tabuList.recordOperation(custA, i, custB, j);
+                                    return true;
+                                }
+                            }      
+                        }//try reverse insertion
+                        else if(Route::checkIfPossibleDeleteInsert(
+                            solution->getRoute(j), custB, solution->getRoute(i), custA, routeImpr
+                        )){
+                            std::swap(__custA, __custB);
+                            std::swap(__routeA, __routeB);
+
+                            if(tabuList.isValidMove(custB, j, custA, i)){
+                                
+                                d = routeImpr.objectiveFunction();
+                                if(d < eps){
+
+                                    tabuList.recordOperation(custB, j, custA, i);
+                                    return true;                                    
+                                }
+
+                                //give a second chance with some probability
+                                p = d * (1.f - k1) * (1.f - k2);
+
+                                if(this->probabilityThreshold() > p){
+
+                                    tabuList.recordOperation(custB, j, custA, i);
+                                    return true;
+                                }
+                            }                                 
+                        }
                     }
                     else {
                         //consider swap operation
+                        if(Route::checkIfPossibleSwapBetweenRoutes(
+                            solution->getRoute(i), custA, solution->getRoute(j), custB, routeImpr
+                        )){
+                            d = routeImpr.objectiveFunction();
+                            if(tabuList.isValidMove(custA, i, custB, j)){
+                                
+                                if(d < eps){//route improvmement
 
+                                    tabuList.recordOperation(custA, i, custB, j);
+                                    return true;
+                                }
+
+                                //give a second chance with some probability
+                                p = d * (1.f - k1) * (1.f - k2);
+
+                                if(this->probabilityThreshold() > p){
+
+                                    tabuList.recordOperation(custA, i, custB, j);
+                                    return true;
+                                }      
+                            }               
+                        }
                     }
-                    //to do
                 }
             }
         }
     }
+
+    return false;
 }
 
 void SimmulatedAnnealing::routeRearange(std::vector<int> & indexes){
-
+ 
     std::random_shuffle(indexes.begin(), indexes.end());
+}
+
+float SimmulatedAnnealing::probabilityThreshold(){
+
+    return static_cast<float>(rand())/RAND_MAX;
 }

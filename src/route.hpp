@@ -76,8 +76,27 @@ class Route{
             this->totalCapacity = 0;
         }
 
+        Route(Route & route){
+
+            this->magazine = new Customer(
+                route.magazine->id, route.magazine->x, 
+                route.magazine->y, route.magazine->q, 
+                route.magazine->e, route.magazine->l, route.magazine->d
+            );
+
+            this->route = route.route;
+
+            this->route.front().customer = this->magazine;
+            this->route.back().customer = this->magazine;
+
+            this->totalCapacity = route.totalCapacity;
+            this->totalTimeCost = route.totalTimeCost;
+            this->totalRouteCost = route.totalRouteCost;
+            this->MAX_CAPACITY = route.MAX_CAPACITY;
+        }
+
         virtual ~Route(){
-            // delete magazine;
+            delete magazine;
         }
 
         routeCustomer & operator[](std::size_t _i);

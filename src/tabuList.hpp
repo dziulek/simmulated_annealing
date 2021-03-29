@@ -9,6 +9,7 @@ class TabuList{
 
 private:
 
+    const int MAXVALUE = 1e9;
     std::vector<std::vector<int>> tabu;
     int time;//represents history
     int tabuPeriod;

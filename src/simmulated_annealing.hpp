@@ -4,6 +4,7 @@
 #include "customer.hpp"
 #include "route.hpp"
 #include "solution.hpp"
+#include "tabuList.hpp"
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -32,8 +33,10 @@ private:
     CRPTW_Solution & greedy_init_alg();
     void setParams(const float avgCostIncrease);
     bool terminateSearch();
-    bool nextMove();//algorithm for searching next move
+    bool nextMove(int & CustA, int & routeA, int &custB, int & routeB, TabuList & tabuList, int & moveNumber);//algorithm for searching next move
     void routeRearange(std::vector<int> & indexes);
+
+    float probabilityThreshold();
 
     std::string stringToLower(std::string & s);
 

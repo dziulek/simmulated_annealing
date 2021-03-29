@@ -2,15 +2,19 @@
 
 void TabuList::actualizeTabuList(){
 
-    for(auto & customer : tabu){
+    if(this->time > MAXVALUE){
+        
+        for(auto & customer : tabu){
 
-        for(auto & value : customer){
-            
-            value = std::max(0, value - time);
+            for(auto & value : customer){
+                
+                value = std::max(0, value - time);
+            }
         }
+        //reset history
+        time = 0;        
     }
-    //reset history
-    time = 0;
+
 }
 
 void TabuList::incrementTime(){

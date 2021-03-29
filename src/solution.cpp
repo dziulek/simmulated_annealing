@@ -3,17 +3,17 @@
 Route & CRPTW_Solution::getRoute(unsigned int i){
 
     //check index to do
-    return *this->routes[i].get();
+    return *this->routes[i];
 }
 
 Route & CRPTW_Solution::addRoute(){
 
     Route * route = new Route(*this->providerInfo);
-    std::unique_ptr<Route> temp_ptr = std::make_unique<Route>(*route);
-    this->routes.push_back(std::move(temp_ptr));
+    // std::unique_ptr<Route> temp_ptr = std::make_unique<Route>(*route);
+    this->routes.push_back(std::move(route));
     this->nOfRoutes++;
 
-    return *this->routes.back().get();
+    return *this->routes.back();
 }
 
 void CRPTW_Solution::deleteRoute(unsigned int i){
@@ -22,8 +22,8 @@ void CRPTW_Solution::deleteRoute(unsigned int i){
     this->routes.pop_back();
 
     this->nOfRoutes --;
-    this->totalDistance -= (*routes[i].get())[routes[i].get()->getSizeOfroute() - 1].distance;
-    this->totalTime -= this->routes[i].get()->getRouteCost();
+    this->totalDistance -= (*routes[i])[routes[i]->getSizeOfroute() - 1].distance;
+    this->totalTime -= this->routes[i]->getRouteCost();
 
     this->routes[i] = std::move(this->routes.back());
 }
@@ -49,7 +49,7 @@ float CRPTW_Solution::getTotalDistance(){
 
     for(auto & route : routes){
         
-        sum += (*route.get())[route.get()->getSizeOfroute() - 1].distance;
+        sum += (*route)[route->getSizeOfroute() - 1].distance;
     }
     this->totalDistance = sum;
 
@@ -61,7 +61,7 @@ float CRPTW_Solution::getTotalTime(){
     float sum = 0;
     for(auto & route : routes){
 
-        sum += route.get()->getTimeCost();
+        sum += route->getTimeCost();
     }
 
     this->totalTime = sum;
