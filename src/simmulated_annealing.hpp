@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <chrono>
 
 class SimmulatedAnnealing {
 
@@ -40,6 +41,8 @@ private:
 
     std::string stringToLower(std::string & s);
 
+    bool compareCustomers(Route * route, const Customer * c1, const Customer * c2);
+
 public:
 
     SimmulatedAnnealing(){
@@ -55,11 +58,12 @@ public:
 
     int parseDataFromFile(std::string fileName);
     CRPTW_Solution & findInitSolution(const char* alg_name);
-    CRPTW_Solution & runAlgorithm(std::string initAlg="greedy");
+    void runAlgorithm(std::string initAlg="greedy");
 
     Customer & getCustomer(unsigned int index);
     ProviderInfo & getProviderInfo();
     unsigned int getCustomerNumber();
+    CRPTW_Solution * getSolution(){return this->solution;}
 
 };
 

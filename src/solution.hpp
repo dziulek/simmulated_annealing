@@ -44,6 +44,7 @@ public:
 
     CRPTW_Solution(const CRPTW_Solution & solution){
         
+        std::cerr << "in solution copy constructor" << std::endl;
         if(this->providerInfo != nullptr)
             this->providerInfo = new ProviderInfo{
 
@@ -56,7 +57,13 @@ public:
 
         this->providerInfo->due_date = solution.providerInfo->due_date;
 
-        this->routes = solution.routes;
+        this->routes.clear();
+        this->routes.shrink_to_fit();
+        for(auto & route : solution.routes){
+            
+            Route * newRoute = new Route(*route);
+            this->routes.push_back(newRoute);
+        }
         //other field
         this->nOfRoutes = solution.nOfRoutes;
         this->totalDistance = solution.totalDistance;

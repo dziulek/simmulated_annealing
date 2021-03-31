@@ -67,6 +67,8 @@ class Route{
         Route(ProviderInfo & pi) : MAX_CAPACITY(pi.truck_capacity){
 
             magazine = new Customer(0, pi.warehouse_x, pi.warehouse_y, 0.0f, 0.0f, pi.due_date, 0.0f);
+            this->route.clear();
+            this->route.shrink_to_fit();
             this->route.push_back({magazine, 0.f, 0.f, 0.f});
             this->route.push_back({magazine, 0.f, 0.f, 0.f});
 
@@ -76,7 +78,7 @@ class Route{
             this->totalCapacity = 0;
         }
 
-        Route(Route & route){
+        Route(const Route & route){
 
             this->magazine = new Customer(
                 route.magazine->id, route.magazine->x, 

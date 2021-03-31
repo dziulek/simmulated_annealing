@@ -11,7 +11,8 @@ int main(int argc, char * argv[]){
     
     int e = annealing.parseDataFromFile("/home/czewian/Dokumenty/simmulated_annealing/tests/testDataFiles/m2kvrptw-0.txt");
     if(e == 1){
-        CRPTW_Solution * solution = &annealing.runAlgorithm();
+        annealing.runAlgorithm();
+        CRPTW_Solution * solution = annealing.getSolution();
 
         for(int i = 0; i < solution->getNOfRoutes(); i++){
             for(int j = 0; j < solution->getRoute(i).getSizeOfroute(); j++){

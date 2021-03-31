@@ -36,17 +36,16 @@ CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
         cust_to_visit.push_back(&customer);
     }
     Route * current_route = &solution->addRoute();
+
+    for(int i = 0; i < cust_to_visit.size() -2; i++)
+        for(int j = i + 1; j < cust_to_visit.size() -1; j++)
+            Customer::dist(*cust_to_visit[i], *cust_to_visit[j]);
     
     while(n_remain > 0){
         
         int n = current_route->getSizeOfroute();
-        //search for best fitting customer (beginTime criteria)
-        std::sort(cust_to_visit.begin(), cust_to_visit.end(), [&](Customer *c1, Customer *c2){
-            return current_route->newBeginTime(current_route->getLastCustomer(), *c1) <
-                                current_route->newBeginTime(current_route->getLastCustomer(), *c2);
-        });
-
-        
+        // search for best fitting customer (beginTime criteria)
+        // std::sort(cust_to_visit.begin(), cust_to_visit.end(), compareCustomers());
 
         bool picked = false;
 
@@ -82,6 +81,12 @@ CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
     return *solution;
 }
 
+bool SimmulatedAnnealing::compareCustomers(Route * route, const Customer * c1, const Customer * c2){
+
+    const routeCustomer * last = &route->getLastCustomer();
+    return route->newBeginTime(*last, *c1) < route->newBeginTime(*last, *c2);
+}
+
 int SimmulatedAnnealing::parseDataFromFile(std::string fileName){
 
     std::fstream input;
@@ -96,6 +101,9 @@ int SimmulatedAnnealing::parseDataFromFile(std::string fileName){
     //clear current dataset and solution
     this->customers.clear();
     this->customers.shrink_to_fit();
+    
+    std::cout << "Loading data...\n";
+
     if(solution == nullptr){
         this->solution = new CRPTW_Solution();
     }
@@ -155,6 +163,8 @@ int SimmulatedAnnealing::parseDataFromFile(std::string fileName){
 
     input.close();
 
+    std::cout << "Data Succesfully loaded.\n" + std::to_string(customers.size()) + " customers.\n";
+
     return 1;
 }
 
@@ -184,7 +194,7 @@ std::string SimmulatedAnnealing::stringToLower(std::string & s){
     return out;
 }
 
-CRPTW_Solution & SimmulatedAnnealing::runAlgorithm(std::string initAlg){
+void SimmulatedAnnealing::runAlgorithm(std::string initAlg){
 
     //check if all resources have been loaded
     if(customers.size() == 0){
@@ -197,14 +207,19 @@ CRPTW_Solution & SimmulatedAnnealing::runAlgorithm(std::string initAlg){
     //clear previous output
     if(this->solution != nullptr){
         delete this->solution;
+        this->solution = new CRPTW_Solution(*this->providerInfo);
     }
 
-    this->solution = new CRPTW_Solution(*this->providerInfo);
-    this->solution = &greedy_init_alg();
+    // this->solution = new CRPTW_Solution(*this->providerInfo);
+    // this->solution = 
 
-    CRPTW_Solution * current_solution = this->solution;
+    CRPTW_Solution * current_solution = &greedy_init_alg();
+
+    
 
     CRPTW_Solution bestSolution = *current_solution;
+
+    // return (void)"siemano";
 
     int random_iterations = 0;
     int continuous_overlap = 0;
@@ -289,45 +304,52 @@ CRPTW_Solution & SimmulatedAnnealing::runAlgorithm(std::string initAlg){
 
     TabuList tabuList(*current_solution, customers.size());
 
-    while(temperature >= (TEMPINIT / FINDDIVISOR) && solution->getNOfRoutes() > 2){
+    auto START = std::chrono::steady_clock::now();
 
-        while(optimumConstCounter < this->MAX_TIME && __counter * MIN_PERCENT <= (__counter - rejectedIterations) && solution->getNOfRoutes() > 2){
+    // while(temperature >= (TEMPINIT / FINDDIVISOR) && solution->getNOfRoutes() > 2){
 
-            if(nextMove(custA, routeA, custB, routeB, tabuList, moveType)){
+    //     optimumConstCounter = 0;
+    //     __counter = 0;
+    //     rejectedIterations = 0;
+    //     while(optimumConstCounter < this->MAX_TIME && __counter * MIN_PERCENT <= (__counter - rejectedIterations) && solution->getNOfRoutes() > 2
+    //                     && std::chrono::duration<double>(std::chrono::steady_clock::now() - START).count() < 60){
 
-                if(moveType == 0){
+    //         if(nextMove(custA, routeA, custB, routeB, tabuList, moveType)){
 
-                    Route::execDeleteInsert(solution->getRoute(routeA), custA, solution->getRoute(routeB), custB);
-                }
-                else {
+    //             if(moveType == 0){
 
-                    Route::execSwapBetweenRoutes(solution->getRoute(routeA), custA, solution->getRoute(routeB), custB);
-                }
+    //                 Route::execDeleteInsert(solution->getRoute(routeA), custA, solution->getRoute(routeB), custB);
+    //             }
+    //             else {
 
-                //check if found best solution
-                if(solution->objectiveFunction() < bestSolution.objectiveFunction()){
+    //                 Route::execSwapBetweenRoutes(solution->getRoute(routeA), custA, solution->getRoute(routeB), custB);
+    //             }
 
-                    bestSolution = *solution;
-                    optimumConstCounter = 0;
-                }
-                else optimumConstCounter ++;
-            }
-            else {
+    //             //check if found best solution
+    //             if(solution->objectiveFunction() < bestSolution.objectiveFunction()){
 
-                rejectedIterations ++;
-                optimumConstCounter ++;
+    //                 bestSolution = *solution;
+    //                 optimumConstCounter = 0;
+    //             }
+    //             else optimumConstCounter ++;
+    //         }
+    //         else {
+
+    //             rejectedIterations ++;
+    //             optimumConstCounter ++;
                 
-            }
-            __counter ++;
-            tabuList.incrementTime();
-        }
+    //         }
+    //         __counter ++;
+    //         tabuList.incrementTime();
+    //     }
 
-        temperature *= this->RATIO;
-        tabuList.actualizeTabuList();
-    }
-    *this->solution = bestSolution;
+    //     temperature *= this->RATIO;
+    //     tabuList.actualizeTabuList();
 
-    return *this->solution;
+    //     std::cerr << "Temperature: " << temperature << std::endl;
+    // }
+    delete this->solution;
+    this->solution = new CRPTW_Solution(bestSolution);
 }
 
 void SimmulatedAnnealing::setParams(const float avgCostIncrease){
