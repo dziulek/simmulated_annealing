@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include "../src/customer.hpp"
-#include "../src/route.hpp"
+#include "../src/main/customer.hpp"
+#include "../src/main/route.hpp"
 
 #define OPEN_WINDOW 0
 #define CLOSE_WINDOW 10000

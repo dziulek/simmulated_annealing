@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "solution.hpp"
+#include "../src/main/solution.hpp"
 
 class CRPTW_SolutionFixture : public ::testing::Test{
 

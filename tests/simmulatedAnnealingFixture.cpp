@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../src/simmulated_annealing.hpp"
+#include "../src/main/simmulated_annealing.hpp"
 #include <iostream>
 #include <cmath>
 #include <unistd.h>

@@ -45,7 +45,10 @@ CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
         
         int n = current_route->getSizeOfroute();
         // search for best fitting customer (beginTime criteria)
-        // std::sort(cust_to_visit.begin(), cust_to_visit.end(), compareCustomers());
+        std::sort(cust_to_visit.begin(), cust_to_visit.end(), [&](const Customer * c1, const Customer * c2){
+            return current_route->newBeginTime(current_route->getLastCustomer(), *c1) < 
+                        current_route->newBeginTime(current_route->getLastCustomer(), *c2);
+        });
 
         bool picked = false;
 
@@ -306,48 +309,48 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg){
 
     auto START = std::chrono::steady_clock::now();
 
-    // while(temperature >= (TEMPINIT / FINDDIVISOR) && solution->getNOfRoutes() > 2){
+    while(temperature >= (TEMPINIT / FINDDIVISOR) && solution->getNOfRoutes() > 2){
 
-    //     optimumConstCounter = 0;
-    //     __counter = 0;
-    //     rejectedIterations = 0;
-    //     while(optimumConstCounter < this->MAX_TIME && __counter * MIN_PERCENT <= (__counter - rejectedIterations) && solution->getNOfRoutes() > 2
-    //                     && std::chrono::duration<double>(std::chrono::steady_clock::now() - START).count() < 60){
+        optimumConstCounter = 0;
+        __counter = 0;
+        rejectedIterations = 0;
+        while(optimumConstCounter < this->MAX_TIME && __counter * MIN_PERCENT <= (__counter - rejectedIterations) && solution->getNOfRoutes() > 2
+                        && std::chrono::duration<double>(std::chrono::steady_clock::now() - START).count() < 60){
 
-    //         if(nextMove(custA, routeA, custB, routeB, tabuList, moveType)){
+            if(nextMove(custA, routeA, custB, routeB, tabuList, moveType)){
 
-    //             if(moveType == 0){
+                if(moveType == 0){
 
-    //                 Route::execDeleteInsert(solution->getRoute(routeA), custA, solution->getRoute(routeB), custB);
-    //             }
-    //             else {
+                    Route::execDeleteInsert(solution->getRoute(routeA), custA, solution->getRoute(routeB), custB);
+                }
+                else {
 
-    //                 Route::execSwapBetweenRoutes(solution->getRoute(routeA), custA, solution->getRoute(routeB), custB);
-    //             }
+                    Route::execSwapBetweenRoutes(solution->getRoute(routeA), custA, solution->getRoute(routeB), custB);
+                }
 
-    //             //check if found best solution
-    //             if(solution->objectiveFunction() < bestSolution.objectiveFunction()){
+                //check if found best solution
+                if(solution->objectiveFunction() < bestSolution.objectiveFunction()){
 
-    //                 bestSolution = *solution;
-    //                 optimumConstCounter = 0;
-    //             }
-    //             else optimumConstCounter ++;
-    //         }
-    //         else {
+                    bestSolution = *solution;
+                    optimumConstCounter = 0;
+                }
+                else optimumConstCounter ++;
+            }
+            else {
 
-    //             rejectedIterations ++;
-    //             optimumConstCounter ++;
+                rejectedIterations ++;
+                optimumConstCounter ++;
                 
-    //         }
-    //         __counter ++;
-    //         tabuList.incrementTime();
-    //     }
+            }
+            __counter ++;
+            tabuList.incrementTime();
+        }
 
-    //     temperature *= this->RATIO;
-    //     tabuList.actualizeTabuList();
+        temperature *= this->RATIO;
+        tabuList.actualizeTabuList();
 
-    //     std::cerr << "Temperature: " << temperature << std::endl;
-    // }
+        std::cerr << "Temperature: " << temperature << std::endl;
+    }
     delete this->solution;
     this->solution = new CRPTW_Solution(bestSolution);
 }

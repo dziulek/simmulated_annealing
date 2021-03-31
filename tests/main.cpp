@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include "../src/customer.hpp"
-#include "../src/route.hpp"
+#include "../src/main/customer.hpp"
+#include "../src/main/route.hpp"
 
 TEST(customer, customer_distance_Test){
     Customer c1(1, 0, 0, 10, 10, 10, 10);

@@ -2,7 +2,7 @@
 #define WINDOW_CONSTRAINT_EXCEPTION_HPP
 
 #include "routeException.hpp"
-#include "customer.hpp"
+#include "../customer.hpp"
 
 class WindowConstraintException : public RouteException{
 
