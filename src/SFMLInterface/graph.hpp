@@ -11,16 +11,14 @@
 
 
 
-class Graph : public sf::Drawable{
+class Graph{
 
 private:
 
     sf::VertexArray locations;
     sf::Vertex magazine;
 
-    float blobRadius = 2.f;
-
-    virtual void draw(sf::RenderTarget & target, sf::RenderStates & states) const;
+    float blobRadius = 1.f;
 
 public:
 
@@ -37,7 +35,7 @@ public:
 
     } 
 
-    void drawGraph(sf::RenderWindow & target, CRPTW_Solution * solution);
+    void drawGraph(sf::RenderWindow & target, sf::View & view, CRPTW_Solution * solution);
 };
 
 #endif

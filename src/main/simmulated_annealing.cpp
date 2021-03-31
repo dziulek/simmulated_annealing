@@ -141,7 +141,7 @@ int SimmulatedAnnealing::parseDataFromFile(std::string fileName){
         it = 0;
         word_num = 0;
         while(it < line.length()){
-            if(line[it] == ' ' || line[it] == '\t'){
+            if(line[it] == ' ' || line[it] == '\t' || line[it] == '\r'){
                 it ++;continue;
             }
             int next_space = line.find_first_of(" \t", it);

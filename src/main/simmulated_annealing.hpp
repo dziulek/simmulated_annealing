@@ -43,6 +43,8 @@ private:
 
     bool compareCustomers(Route * route, const Customer * c1, const Customer * c2);
 
+    
+
 public:
 
     SimmulatedAnnealing(){
@@ -65,6 +67,9 @@ public:
     unsigned int getCustomerNumber();
     CRPTW_Solution * getSolution(){return this->solution;}
 
+    std::vector<Customer> & getCustomers(){return this->customers;}
+
+    friend class Graph;
 };
 
 #endif

@@ -1,10 +1,13 @@
 #include "graph.hpp"
 
 
-void Graph::drawGraph(sf::RenderWindow & target, CRPTW_Solution * solution){
+void Graph::drawGraph(sf::RenderWindow & target, sf::View & view, CRPTW_Solution * solution){
 
+    target.setView(view);
     sf::CircleShape CustomerBlob(blobRadius);
-    CustomerBlob.setFillColor(sf::Color::White);
+    CustomerBlob.setFillColor(sf::Color::Black);
+    CustomerBlob.setOutlineColor(sf::Color::White);
+    CustomerBlob.setOutlineThickness(0.1f);
     CustomerBlob.setOrigin(sf::Vector2f(blobRadius, blobRadius));
 
     for(int i = 0; i < locations.getVertexCount(); i++){
