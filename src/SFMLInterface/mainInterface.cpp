@@ -59,6 +59,16 @@ int main()
                     lastMousePos = window.mapPixelToCoords(sf::Vector2i(event.mouseMove.x, event.mouseMove.y));
                 }
             }
+            if(event.type == sf::Event::Resized){
+
+                float new_width, new_height;
+                new_width = event.size.width;
+                new_height = event.size.height;
+
+                float ratio = new_height / new_width;
+
+                graphView.setSize(sf::Vector2f(graphView.getSize().x, graphView.getSize().x * ratio));
+            }
         }
 
         window.clear(sf::Color::Black);
