@@ -14,14 +14,16 @@ int main()
 
     CRPTW_Solution * solution = annealing.getSolution();
 
-    Graph graph(annealing.getCustomers(), annealing.getProviderInfo());
+
 
     sf::RenderWindow window(sf::VideoMode(800, 800), "My window");
     sf::View graphView;
     graphView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
     window.setView(graphView);
 
-    sf::Vector2i lastMousePos = sf::Mouse::getPosition();
+    Graph graph(window, graphView, annealing.getCustomers(), annealing.getProviderInfo());
+
+    sf::Vector2f lastMousePos = window.mapPixelToCoords(sf::Mouse::getPosition());
     bool canMoveMap = false;
 
     while (window.isOpen())
@@ -42,7 +44,7 @@ int main()
             if(event.type == sf::Event::MouseButtonPressed){
                 
                 canMoveMap = true;
-                lastMousePos = {event.mouseButton.x, event.mouseButton.y};
+                lastMousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
             }
             if(event.type == sf::Event::MouseButtonReleased){
 
@@ -51,17 +53,17 @@ int main()
             if(event.type == sf::Event::MouseMoved){
 
                 if(canMoveMap){
-                    sf::Vector2f v = static_cast<sf::Vector2f>(sf::Vector2i(event.mouseMove.x, event.mouseMove.y) - lastMousePos);
+                    sf::Vector2f v = window.mapPixelToCoords(sf::Vector2i(event.mouseMove.x, event.mouseMove.y)) - lastMousePos;
 
                     graphView.setCenter(graphView.getCenter() - v);
-                    lastMousePos = sf::Vector2i(event.mouseMove.x, event.mouseMove.y);
+                    lastMousePos = window.mapPixelToCoords(sf::Vector2i(event.mouseMove.x, event.mouseMove.y));
                 }
             }
         }
 
         window.clear(sf::Color::Black);
         
-        graph.drawGraph(window, graphView, solution);
+        graph.drawGraph(solution);
         window.display();
     }
 
