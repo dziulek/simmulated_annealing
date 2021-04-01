@@ -15,6 +15,8 @@ jobs:
     - uses: actions/checkout@v2
       with: 
         submodules: 'recursive'
+    - name: install sfml
+      run: sudo apt install libsfml-dev
     - name: CMake Configure
       run: cmake -Bbuild
     - name: CMake Build
