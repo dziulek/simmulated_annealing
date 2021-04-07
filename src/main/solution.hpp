@@ -45,17 +45,19 @@ public:
     CRPTW_Solution(const CRPTW_Solution & solution){
         
         std::cerr << "in solution copy constructor" << std::endl;
-        if(this->providerInfo != nullptr)
-            this->providerInfo = new ProviderInfo{
+        // if(this->providerInfo != nullptr)
+        //     this->providerInfo = new ProviderInfo{
 
-                solution.providerInfo->vehicle_number,
-                solution.providerInfo->warehouse_x,
-                solution.providerInfo->warehouse_y,                
-                solution.providerInfo->truck_capacity,
-                solution.providerInfo->due_date               
-            };
+        //         solution.providerInfo->vehicle_number,
+        //         solution.providerInfo->warehouse_x,
+        //         solution.providerInfo->warehouse_y,                
+        //         solution.providerInfo->truck_capacity,
+        //         solution.providerInfo->due_date               
+        //     };
 
-        this->providerInfo->due_date = solution.providerInfo->due_date;
+        // this->providerInfo->due_date = solution.providerInfo->due_date;
+
+        this->providerInfo = solution.providerInfo;
 
         this->routes.clear();
         this->routes.shrink_to_fit();

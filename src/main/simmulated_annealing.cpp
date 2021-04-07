@@ -158,6 +158,9 @@ int SimmulatedAnnealing::parseDataFromFile(std::string fileName){
             customers.emplace_back((int)words[0], words[1], words[2], words[3], words[4], words[5], words[6]);
         }
     }
+    if(customers.back().id == (customers.end() - 2)->id)
+        customers.pop_back();
+
     if(this->providerInfo != nullptr)
         delete this->providerInfo;
     this->providerInfo = temp_prov_info;
@@ -247,7 +250,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg){
     while(continuous_overlap < customers.size() * customers.size() && 
                     random_iterations < N_RANDOM_ITERATIONS && solution->getNOfRoutes() > 2){
 
-        move_number = rand()%2;
+        move_number = rand()%Route::NMOVES;
         route_i = rand()%current_solution->getNOfRoutes();
         route_j = rand()%current_solution->getNOfRoutes();
 
@@ -257,7 +260,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg){
         cust_i = rand()%(current_solution->getRoute(route_i).getSizeOfroute() - 2) + 1;
         cust_j = rand()%(current_solution->getRoute(route_j).getSizeOfroute() - 2) + 1;
 
-        if(move_number == 0){
+        if(move_number == Route::DELETE_INSERT){
 
             if(Route::checkIfPossibleDeleteInsert(current_solution->getRoute(route_i), cust_i, 
                                         current_solution->getRoute(route_j), cust_j, routeImprv)){
@@ -309,29 +312,32 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg){
 
     auto START = std::chrono::steady_clock::now();
 
-    while(temperature >= (TEMPINIT / FINDDIVISOR) && solution->getNOfRoutes() > 2){
+    while(temperature >= (TEMPINIT / FINDDIVISOR) && current_solution->getNOfRoutes() > 2){
 
         optimumConstCounter = 0;
         __counter = 0;
         rejectedIterations = 0;
         while(optimumConstCounter < this->MAX_TIME && __counter * MIN_PERCENT <= (__counter - rejectedIterations) && solution->getNOfRoutes() > 2
-                        && std::chrono::duration<double>(std::chrono::steady_clock::now() - START).count() < 60){
+                        && std::chrono::duration<double>(std::chrono::steady_clock::now() - START).count() < 20){
 
             if(nextMove(custA, routeA, custB, routeB, tabuList, moveType)){
 
-                if(moveType == 0){
+                if(moveType == Route::DELETE_INSERT){
 
-                    Route::execDeleteInsert(solution->getRoute(routeA), custA, solution->getRoute(routeB), custB);
+                    Route::execDeleteInsert(current_solution->getRoute(routeA), custA, current_solution->getRoute(routeB), custB);
+                    if(current_solution->getRoute(routeA).getSizeOfroute() == 2){
+                        current_solution->deleteRoute(routeA);
+                    }
                 }
                 else {
 
-                    Route::execSwapBetweenRoutes(solution->getRoute(routeA), custA, solution->getRoute(routeB), custB);
+                    Route::execSwapBetweenRoutes(current_solution->getRoute(routeA), custA, current_solution->getRoute(routeB), custB);
                 }
 
                 //check if found best solution
-                if(solution->objectiveFunction() < bestSolution.objectiveFunction()){
+                if(current_solution->objectiveFunction() < bestSolution.objectiveFunction()){
 
-                    bestSolution = *solution;
+                    bestSolution = CRPTW_Solution(*current_solution);
                     optimumConstCounter = 0;
                 }
                 else optimumConstCounter ++;

@@ -8,7 +8,7 @@
 int main()
 {   
     SimmulatedAnnealing annealing;
-    annealing.parseDataFromFile("/home/czewian/Dokumenty/simmulated_annealing/tests/solomonInstances/solomon_50/C101.txt");
+    annealing.parseDataFromFile("/home/czewian/Dokumenty/simmulated_annealing/tests/solomonInstances/solomon_50/C103.txt");
 
     annealing.findInitSolution("greedy");
 

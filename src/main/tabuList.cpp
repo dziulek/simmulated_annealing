@@ -23,9 +23,10 @@ void TabuList::incrementTime(){
 
 bool TabuList::isValidMove(const int custA, const int routeA, const int custB, const int routeB){
 
-    if(this->tabu[custA][routeA] > time || this->tabu[custB][routeB] > time) return true;
+    // if(this->tabu[custA][routeA] > time || this->tabu[custB][routeB] > time) return true;
 
-    return false;
+    // return false;
+    return true;
 }
 
 void TabuList::resetTime(){
@@ -36,6 +37,6 @@ void TabuList::resetTime(){
 void TabuList::recordOperation(const int custA, const int routeA, const int custB, const int routeB){
 
     //now it is simplified
-    this->tabu[custA][routeA] += tabuPeriod;//customer A can't return to route A in tabuPeriod time
-    this->tabu[custB][routeB] += tabuPeriod;//customer B cant't return to route B in tabuPeriod time
+    this->tabu[custA][routeA] = this->time + tabuPeriod;//customer A can't return to route A in tabuPeriod time
+    this->tabu[custB][routeB] = this->time + tabuPeriod;//customer B cant't return to route B in tabuPeriod time
 }

@@ -45,26 +45,26 @@ float CRPTW_Solution::objectiveFunction(float route_coeff, float distance_coeff,
 
 float CRPTW_Solution::getTotalDistance(){
     
-    float sum = 0;
+    // float sum = 0;
 
-    for(auto & route : routes){
+    // for(auto & route : routes){
         
-        sum += (*route)[route->getSizeOfroute() - 1].distance;
-    }
-    this->totalDistance = sum;
+    //     sum += (*route)[route->getSizeOfroute() - 1].distance;
+    // }
+    // this->totalDistance = sum;
 
     return this->totalDistance;
 }
 
 float CRPTW_Solution::getTotalTime(){
 
-    float sum = 0;
-    for(auto & route : routes){
+    // float sum = 0;
+    // for(auto & route : routes){
 
-        sum += route->getTimeCost();
-    }
+    //     sum += route->getTimeCost();
+    // }
 
-    this->totalTime = sum;
+    // this->totalTime = sum;
     return this->totalTime;
 }
 

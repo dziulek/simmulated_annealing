@@ -63,6 +63,13 @@ class Route{
         bool checkIfCanReturnInTime();
 
     public:
+        
+        //defines types of moves you can perfom on route
+        enum Move{
+            DELETE_INSERT, SWAP
+        };
+
+        static const int NMOVES = 2;
 
         Route(ProviderInfo & pi) : MAX_CAPACITY(pi.truck_capacity){
 

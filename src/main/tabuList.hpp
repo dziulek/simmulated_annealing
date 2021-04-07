@@ -23,6 +23,8 @@ public:
             c.resize(solution.getNOfRoutes(), 0);
         }
         time = 0;
+        
+        tabuPeriod = nCustomers / 10;
     }
 
     virtual ~TabuList(){
