@@ -1,7 +1,7 @@
 #include "simmulated_annealing.hpp"
 
 
-CRPTW_Solution & SimmulatedAnnealing::findInitSolution(const char* alg_name){
+void SimmulatedAnnealing::findInitSolution(const char* alg_name){
     if(customers.size() == 0){
         //to do
         //throw exception
@@ -12,11 +12,11 @@ CRPTW_Solution & SimmulatedAnnealing::findInitSolution(const char* alg_name){
     }
     //to do -> implementation of more algorithms
 
-    return greedy_init_alg();
+    greedy_init_alg();
 }
 
 //the simplest algorithm for finding initial solution for the problem
-CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
+void SimmulatedAnnealing::greedy_init_alg(){
 
     //clear current solution
     //to do
@@ -80,8 +80,6 @@ CRPTW_Solution & SimmulatedAnnealing::greedy_init_alg(){
         }
         
     }
-
-    return *solution;
 }
 
 bool SimmulatedAnnealing::compareCustomers(Route * route, const Customer * c1, const Customer * c2){
@@ -218,10 +216,10 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg){
 
     // this->solution = new CRPTW_Solution(*this->providerInfo);
     // this->solution = 
+    greedy_init_alg();
 
-    CRPTW_Solution * current_solution = &greedy_init_alg();
+    CRPTW_Solution * current_solution = solution;
 
-    
 
     CRPTW_Solution bestSolution = *current_solution;
 
@@ -318,7 +316,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg){
         __counter = 0;
         rejectedIterations = 0;
         while(optimumConstCounter < this->MAX_TIME && __counter * MIN_PERCENT <= (__counter - rejectedIterations) && solution->getNOfRoutes() > 2
-                        && std::chrono::duration<double>(std::chrono::steady_clock::now() - START).count() < 20){
+                        && std::chrono::duration<double>(std::chrono::steady_clock::now() - START).count() < 10){
 
             if(nextMove(custA, routeA, custB, routeB, tabuList, moveType)){
 

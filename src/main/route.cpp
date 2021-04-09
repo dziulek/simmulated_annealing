@@ -91,7 +91,7 @@ bool Route::checkIfCanReturnInTime(){
 
 bool Route::appendCustomer(Customer &c){
 
-    float d = this->getLastCustomer().distance + Customer::dist(c, *route.back().customer);
+    float d = this->getLastCustomer().distance + Customer::dist(*this->getLastCustomer().customer, c);
     float b = this->newBeginTime(this->getLastCustomer(), c);
 
     float wTime = calcWaitingTime(this->getLastCustomer(), c);
@@ -114,7 +114,7 @@ bool Route::appendCustomer(Customer &c){
 
     this->totalCapacity += c.q;
     this->route.back().beginTime = returnTime;
-    this->route.back().distance += (d + Customer::dist(*this->route.back().customer, c));
+    this->route.back().distance = d + Customer::dist(*this->route.back().customer, c);
 
     this->route.insert(route.begin() + route.size() - 1 , {&c, b, d, wTime});
 

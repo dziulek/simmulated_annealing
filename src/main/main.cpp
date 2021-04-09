@@ -9,9 +9,12 @@ int main(int argc, char * argv[]){
     srand(time(0));
     SimmulatedAnnealing annealing;
     
-    int e = annealing.parseDataFromFile("/home/czewian/Dokumenty/simmulated_annealing/tests/testDataFiles/m2kvrptw-0.txt");
+    int e = annealing.parseDataFromFile("/home/czewian/Dokumenty/simmulated_annealing/tests/solomonInstances/solomon_50/C101.txt");
     if(e == 1){
-        annealing.runAlgorithm();
+        annealing.findInitSolution("default");
+
+        std::cout <<"valid solution: " << CRPTW_Solution::isValid(*annealing.getSolution()) << std::endl;
+
         CRPTW_Solution * solution = annealing.getSolution();
 
         for(int i = 0; i < solution->getNOfRoutes(); i++){

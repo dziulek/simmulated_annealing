@@ -31,7 +31,7 @@ private:
     float MAX_TIME;//
     float MIN_PERCENT;
 
-    CRPTW_Solution & greedy_init_alg();
+    void greedy_init_alg();
     void setParams(const float avgCostIncrease);
     bool terminateSearch();
     bool nextMove(int & CustA, int & routeA, int &custB, int & routeB, TabuList & tabuList, int & moveNumber);//algorithm for searching next move
@@ -59,7 +59,7 @@ public:
     }
 
     int parseDataFromFile(std::string fileName);
-    CRPTW_Solution & findInitSolution(const char* alg_name);
+    void findInitSolution(const char* alg_name);
     void runAlgorithm(std::string initAlg="greedy");
 
     Customer & getCustomer(unsigned int index);

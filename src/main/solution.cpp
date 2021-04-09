@@ -43,32 +43,30 @@ float CRPTW_Solution::objectiveFunction(float route_coeff, float distance_coeff,
     return this->routes.size() * route_coeff + this->getTotalDistance() * distance_coeff + this->getTotalTime() * time_coeff;
 }
 
-float CRPTW_Solution::getTotalDistance(){
+float CRPTW_Solution::getTotalDistance() const{
     
-    // float sum = 0;
+    float sum = 0;
 
-    // for(auto & route : routes){
+    for(auto & route : routes){
         
-    //     sum += (*route)[route->getSizeOfroute() - 1].distance;
-    // }
-    // this->totalDistance = sum;
+        sum += route->getRouteCost();
+    }
 
-    return this->totalDistance;
+    return sum;
 }
 
-float CRPTW_Solution::getTotalTime(){
+float CRPTW_Solution::getTotalTime() const{
 
-    // float sum = 0;
-    // for(auto & route : routes){
+    float sum = 0;
+    for(auto & route : routes){
 
-    //     sum += route->getTimeCost();
-    // }
+        sum += route->getTimeCost();
+    }
 
-    // this->totalTime = sum;
-    return this->totalTime;
+    return sum;
 }
 
-unsigned int CRPTW_Solution::getNOfRoutes(){
+unsigned int CRPTW_Solution::getNOfRoutes() const{
 
     return this->nOfRoutes;
 }
@@ -88,4 +86,53 @@ void CRPTW_Solution::clearSolution(){
 void CRPTW_Solution::addProviderInfo(ProviderInfo & provInfo){
 
     this->providerInfo = &provInfo;
+}
+
+bool CRPTW_Solution::isValid(const CRPTW_Solution & solution){
+
+    float current_time = 0, current_distance = 0;
+    int truckNo = 0;
+    float totalTime = 0.f, totalCost = 0.f;
+    float ep = 0.001;
+    float rem_capacity;
+
+    for(auto & route : solution.routes){
+
+        current_time = 0.f;
+        current_distance = 0.f;
+        rem_capacity = solution.providerInfo->truck_capacity;
+
+        for(int i = 0; i < route->getSizeOfroute() - 1; i++){
+
+            rem_capacity -= (*route)[i + 1].customer->q;
+
+            current_distance += Customer::dist(*(*route)[i].customer, *(*route)[i + 1].customer);
+            current_time = Route::newBeginTime(*(*route)[i].customer, *(*route)[i + 1].customer, current_time);
+            //window constraints
+            if(current_time > (*route)[i + 1].customer->l){
+                //to do some message
+                return false;
+            }
+
+            //capacity constraints
+            if(rem_capacity < 0){
+                //to do some message
+                return false;
+            }
+        }
+        totalTime += current_time;
+        totalCost += current_distance;
+        truckNo ++;
+    }
+
+    if(abs(totalTime - solution.getTotalTime()) > ep)
+        return false;
+
+    if(abs(totalCost - solution.getTotalDistance()) > ep)
+        return false;
+
+    if(truckNo != solution.nOfRoutes)
+        return false;
+
+    return true;
 }

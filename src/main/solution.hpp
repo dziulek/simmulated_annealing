@@ -77,9 +77,9 @@ public:
     Route & addRoute(const Route & route);
     void deleteRoute(unsigned int i);
 
-    float getTotalDistance();
-    float getTotalTime();
-    unsigned int getNOfRoutes();
+    float getTotalDistance() const;
+    float getTotalTime() const;
+    unsigned int getNOfRoutes() const;
 
     void clearSolution();
     void addProviderInfo(ProviderInfo & provInfo);
@@ -87,6 +87,8 @@ public:
     float objectiveFunction(float route_coeff=1000.0f, float distance_coeff=100.0f, float time_coeff=100.f);
 
     friend class TabuList;
+
+    static bool isValid(const CRPTW_Solution & solution);
 };
 
 #endif

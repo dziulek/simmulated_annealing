@@ -118,7 +118,7 @@ class Route{
 
         routeCustomer & getLastCustomer();
         float getRemainingCapacity() const { return this->MAX_CAPACITY - this->totalCapacity; }
-        float getRouteCost() const { return this->totalRouteCost; }
+        float getRouteCost() const { return this->route.back().distance; }
         float getTimeCost() const;
         unsigned int getSizeOfroute() const { return this->route.size(); }
 
