@@ -56,6 +56,11 @@ public:
         //     };
 
         // this->providerInfo->due_date = solution.providerInfo->due_date;
+        // if(this->providerInfo != nullptr){
+        //     delete this->providerInfo;
+        // }
+        
+        // this->providerInfo = new ProviderInfo;
 
         this->providerInfo = solution.providerInfo;
 

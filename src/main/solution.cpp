@@ -111,12 +111,16 @@ bool CRPTW_Solution::isValid(const CRPTW_Solution & solution){
             //window constraints
             if(current_time > (*route)[i + 1].customer->l){
                 //to do some message
+                std::cerr << "window constraint" << std::endl;
+
                 return false;
             }
 
             //capacity constraints
             if(rem_capacity < 0){
                 //to do some message
+
+                std::cerr << "capacity constraint" << std::endl;
                 return false;
             }
         }
@@ -124,15 +128,30 @@ bool CRPTW_Solution::isValid(const CRPTW_Solution & solution){
         totalCost += current_distance;
         truckNo ++;
     }
+    bool out = true;
 
-    if(abs(totalTime - solution.getTotalTime()) > ep)
-        return false;
+    if(abs(totalTime - solution.getTotalTime()) > ep){
 
-    if(abs(totalCost - solution.getTotalDistance()) > ep)
-        return false;
+        out = false;
+    }
 
-    if(truckNo != solution.nOfRoutes)
-        return false;
+    if(abs(totalCost - solution.getTotalDistance()) > ep){
 
-    return true;
+
+        out = false;
+    }
+
+    if(truckNo != solution.nOfRoutes){
+
+
+        out = false;
+    }
+
+    if(out == false){
+        std::cerr<< "error in total time, expected: " << totalTime << " , found: " << solution.getTotalTime() << std::endl;
+        std::cerr << "error in total cost, expected: " << totalCost << " , found: " << solution.getTotalDistance() << std::endl;
+        std::cerr << "error in number of routes, expected: " << truckNo << " , found: " << solution.nOfRoutes << std::endl;
+    }
+
+    return out;
 }

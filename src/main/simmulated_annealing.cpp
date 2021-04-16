@@ -92,6 +92,7 @@ int SimmulatedAnnealing::parseDataFromFile(std::string fileName){
 
     std::fstream input;
     ProviderInfo * temp_prov_info = new ProviderInfo();
+
     input.open(fileName.c_str(), std::ios::in);
 
     if(!input.is_open()){
@@ -151,6 +152,7 @@ int SimmulatedAnnealing::parseDataFromFile(std::string fileName){
             temp_prov_info->warehouse_x = words[1];
             temp_prov_info->warehouse_y = words[2];
             temp_prov_info->due_date = words[5];
+
         }
         else {
             customers.emplace_back((int)words[0], words[1], words[2], words[3], words[4], words[5], words[6]);
@@ -163,7 +165,13 @@ int SimmulatedAnnealing::parseDataFromFile(std::string fileName){
         delete this->providerInfo;
     this->providerInfo = temp_prov_info;
 
+    if(this->magazine != nullptr)
+        delete this->magazine;
+
+    this->magazine = new Customer(0, providerInfo->warehouse_x, providerInfo->warehouse_y, 0, 0, providerInfo->due_date, 0);
+
     this->solution->addProviderInfo(*this->providerInfo);
+    
 
     input.close();
 
@@ -221,7 +229,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg){
     CRPTW_Solution * current_solution = solution;
 
 
-    CRPTW_Solution bestSolution = *current_solution;
+    CRPTW_Solution * bestSolution = new CRPTW_Solution(*current_solution);
 
     // return (void)"siemano";
 
@@ -301,6 +309,8 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg){
         averageDelta = 1.02;
     }
 
+    std::cerr << "between" <<std::endl;
+
     averageDelta /= N_RANDOM_ITERATIONS;
 
     this->setParams(averageDelta);
@@ -332,10 +342,13 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg){
                     Route::execSwapBetweenRoutes(current_solution->getRoute(routeA), custA, current_solution->getRoute(routeB), custB);
                 }
 
+                if(!CRPTW_Solution::isValid(*current_solution))
+                    return;
                 //check if found best solution
-                if(current_solution->objectiveFunction() < bestSolution.objectiveFunction()){
+                if(current_solution->objectiveFunction() < bestSolution->objectiveFunction()){
 
-                    bestSolution = CRPTW_Solution(*current_solution);
+                    delete bestSolution;
+                    bestSolution = new CRPTW_Solution(*current_solution);
                     optimumConstCounter = 0;
                 }
                 else optimumConstCounter ++;
@@ -356,7 +369,9 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg){
         std::cerr << "Temperature: " << temperature << std::endl;
     }
     delete this->solution;
-    this->solution = new CRPTW_Solution(bestSolution);
+    this->solution = new CRPTW_Solution(*bestSolution);
+
+    delete bestSolution;
 }
 
 void SimmulatedAnnealing::setParams(const float avgCostIncrease){

@@ -48,7 +48,7 @@ class Route{
         float totalTimeCost;
         float totalCapacity;
         float MAX_CAPACITY;
-        Customer * magazine;
+        Customer * magazine = nullptr;
 
         float calcWaitingTime(const unsigned int i);
         float calcWaitingTime(const routeCustomer &prec, const Customer &succ);
@@ -87,13 +87,25 @@ class Route{
 
         Route(const Route & route){
 
+            if(route.magazine->id != 0){
+                std::cerr << "error in magazine" << std::endl;
+            }
+
+            if(this->magazine != nullptr){
+                delete this->magazine;
+            }
             this->magazine = new Customer(
                 route.magazine->id, route.magazine->x, 
                 route.magazine->y, route.magazine->q, 
                 route.magazine->e, route.magazine->l, route.magazine->d
             );
 
-            this->route = route.route;
+            // this->route = route.route;
+            this->route.clear();
+            this->route.shrink_to_fit();
+            for(auto & customer : route.route){
+                this->route.push_back(customer);
+            }
 
             this->route.front().customer = this->magazine;
             this->route.back().customer = this->magazine;
@@ -131,6 +143,8 @@ class Route{
         static bool checkIfPossibleSwapBetweenRoutes( Route &r1, const unsigned int _i, Route &r2, const unsigned int _j, routeImprovement &score);
         static bool execDeleteInsert(Route &r1, const unsigned int _i, Route &r2, const unsigned int _j);
         static bool execSwapBetweenRoutes( Route &r1, const unsigned int _i,  Route &r2, const unsigned int _j);
+
+        static bool isValid(const Route & route);
 
 };
 

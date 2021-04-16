@@ -19,9 +19,12 @@ private:
     CRPTW_Solution * solution;
     std::vector<Customer> customers;
 
-    ProviderInfo * providerInfo;
+    ProviderInfo * providerInfo = nullptr;
     std::string dataSetName;
     std::vector<std::vector<int>> tabuList;
+
+    //temporarily redundant
+    Customer * magazine = nullptr;
 
     //metaheuristic parameters
     float pInit; //initial probability value
@@ -56,6 +59,8 @@ public:
             delete solution;
         if(providerInfo != nullptr)
             delete providerInfo;
+        if(magazine != nullptr)
+            delete magazine;
     }
 
     int parseDataFromFile(std::string fileName);
@@ -68,6 +73,7 @@ public:
     CRPTW_Solution * getSolution(){return this->solution;}
 
     std::vector<Customer> & getCustomers(){return this->customers;}
+    Customer & getMagazine(){ return *this->magazine;}
 
     friend class Graph;
 };

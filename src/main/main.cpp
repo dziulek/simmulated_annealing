@@ -9,11 +9,13 @@ int main(int argc, char * argv[]){
     srand(time(0));
     SimmulatedAnnealing annealing;
     
-    int e = annealing.parseDataFromFile("/home/czewian/Dokumenty/simmulated_annealing/tests/solomonInstances/solomon_50/C101.txt");
+    int e = annealing.parseDataFromFile("/home/czewian/Dokumenty/simmulated_annealing/tests/testDataFiles/dummy.txt");
     if(e == 1){
-        annealing.findInitSolution("default");
+        // annealing.findInitSolution("default");
+        annealing.runAlgorithm();
 
         std::cout <<"valid solution: " << CRPTW_Solution::isValid(*annealing.getSolution()) << std::endl;
+        return 0;
 
         CRPTW_Solution * solution = annealing.getSolution();
 
