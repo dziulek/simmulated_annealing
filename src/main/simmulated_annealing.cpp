@@ -19,7 +19,7 @@ void SimmulatedAnnealing::findInitSolution(const char* alg_name){
 void SimmulatedAnnealing::greedy_init_alg(){
 
     //clear current solution
-    //to do
+    this->solution->clearSolution();
 
     if(customers.size() == 0){
         //throw exception
@@ -226,6 +226,10 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg){
     // this->solution = 
     greedy_init_alg();
 
+    if(!CRPTW_Solution::isValid(*this->solution))
+        return;
+    // std::cerr << "after greedy" << std::endl;
+
     CRPTW_Solution * current_solution = solution;
 
 
@@ -309,8 +313,6 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg){
         averageDelta = 1.02;
     }
 
-    std::cerr << "between" <<std::endl;
-
     averageDelta /= N_RANDOM_ITERATIONS;
 
     this->setParams(averageDelta);
@@ -366,7 +368,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg){
         temperature *= this->RATIO;
         tabuList.actualizeTabuList();
 
-        std::cerr << "Temperature: " << temperature << std::endl;
+        // std::cerr << "Temperature: " << temperature << std::endl;
     }
     delete this->solution;
     this->solution = new CRPTW_Solution(*bestSolution);

@@ -51,7 +51,7 @@ private:
 public:
 
     SimmulatedAnnealing(){
-        solution = new CRPTW_Solution();
+        solution = new CRPTW_Solution(); 
         providerInfo = nullptr;
     }
     virtual ~SimmulatedAnnealing(){

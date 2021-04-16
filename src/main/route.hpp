@@ -51,7 +51,7 @@ class Route{
         Customer * magazine = nullptr;
 
         float calcWaitingTime(const unsigned int i);
-        float calcWaitingTime(const routeCustomer &prec, const Customer &succ);
+        static float calcWaitingTime(const routeCustomer &prec, const Customer &succ);
 
         static bool checkIfPossiblePushRoute(Route &r, const unsigned int _i, float &routeOffsetIn, float &routeOffsetOut);
                 /////////function checks if route can be moved in time by routeOffsetIn (positive -> forward, negative -> backward)

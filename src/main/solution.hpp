@@ -44,7 +44,7 @@ public:
 
     CRPTW_Solution(const CRPTW_Solution & solution){
         
-        std::cerr << "in solution copy constructor" << std::endl;
+        // std::cerr << "in solution copy constructor" << std::endl;
         // if(this->providerInfo != nullptr)
         //     this->providerInfo = new ProviderInfo{
 
