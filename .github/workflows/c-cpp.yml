@@ -18,7 +18,7 @@ jobs:
     - name: install sfml
       run: sudo apt install libsfml-dev
     - name: CMake Configure
-      run: cmake -Bbuild
+      run: mkdir build && cd build && cmake ..
     - name: CMake Build
       run: |
         cd build
