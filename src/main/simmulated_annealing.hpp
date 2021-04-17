@@ -5,12 +5,19 @@
 #include "route.hpp"
 #include "solution.hpp"
 #include "tabuList.hpp"
+#include "constants.hpp"
 #include <vector>
 #include <string>
 #include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <chrono>
+#include <pthread.h>
+
+// #ifdef GRAPH_HPP
+// pthread_mutex_t annealing_operation_mutex = PTHREAD_MUTEX_INITIALIZER;
+// bool GRAPHICAL_INTERFACE = true;
+// #endif
 
 class SimmulatedAnnealing {
 
@@ -65,7 +72,7 @@ public:
 
     int parseDataFromFile(std::string fileName);
     void findInitSolution(const char* alg_name);
-    void runAlgorithm(std::string initAlg="greedy");
+    void runAlgorithm(std::string initAlg="greedy", bool threadSafe=false);
 
     Customer & getCustomer(unsigned int index);
     ProviderInfo & getProviderInfo();

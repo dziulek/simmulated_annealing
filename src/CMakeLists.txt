@@ -15,4 +15,5 @@ add_executable(graphicInterface_run ${GRAPHIC_INTERFACE} ${COMMON_SOURCES})
 
 add_library(${BINARY}_lib STATIC ${COMMON_SOURCES})
 
-target_link_libraries(graphicInterface_run -lsfml-graphics -lsfml-window -lsfml-system)
+target_link_libraries(${BINARY}_run -lpthread)
+target_link_libraries(graphicInterface_run -lsfml-graphics -lsfml-window -lsfml-system -lpthread)

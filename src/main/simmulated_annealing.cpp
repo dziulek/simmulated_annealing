@@ -55,7 +55,13 @@ void SimmulatedAnnealing::greedy_init_alg(){
     for(auto & customer : customers){
         cust_to_visit.push_back(&customer);
     }
+    // if(threadSave)
+    // pthread_mutex_lock(&annealing_operation_mutex);
+// #endif
     Route * current_route = &solution->addRoute();
+// #ifdef GRAPH_HPP
+    // pthread_mutex_unlock(&annealing_operation_mutex);
+// #endif
 
     for(int i = 0; i < cust_to_visit.size() -2; i++)
         for(int j = i + 1; j < cust_to_visit.size() -1; j++)
@@ -84,6 +90,7 @@ void SimmulatedAnnealing::greedy_init_alg(){
                     cust_to_visit.pop_back();
                     n_remain --;
                     picked = true;
+                    // sleep(1);
                     break;
 
                 }catch(WindowConstraintException & e){
@@ -226,7 +233,7 @@ std::string SimmulatedAnnealing::stringToLower(std::string & s){
     return out;
 }
 
-void SimmulatedAnnealing::runAlgorithm(std::string initAlg){
+void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
 
     //check if all resources have been loaded
     if(customers.size() == 0){

@@ -4,17 +4,25 @@
 #include "SFML/System.hpp"
 
 #include "../main/simmulated_annealing.hpp"
+#include <pthread.h>
+#include <stdlib.h>
+#include <netdb.h>
+
+void * calculationThread(void * args){
+    SimmulatedAnnealing * annealing = (SimmulatedAnnealing * )args;
+
+    annealing->findInitSolution("greedy");
+}
 
 int main(int argc, char * argv[])
 {   
-    SimmulatedAnnealing annealing;
-    if(annealing.parseDataFromFile("../tests/solomonInstances/solomon_50/C103.txt") == -1) return -1;
 
-    annealing.findInitSolution("greedy");
+    pthread_t calc_thread;
+    SimmulatedAnnealing annealing;
+    if(annealing.parseDataFromFile(SimmulatedAnnealing::getPathToWorkspaceFolder() + "tests/solomonInstances/solomon_50/C103.txt") == -1) return -1;
+
 
     CRPTW_Solution * solution = annealing.getSolution();
-
-
 
     sf::RenderWindow window(sf::VideoMode(800, 800), "My window");
     sf::View graphView;
@@ -33,6 +41,18 @@ int main(int argc, char * argv[])
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+            if(event.type == sf::Event::KeyPressed){
+                if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space)){
+                        
+                    int status = pthread_create(&calc_thread, NULL, calculationThread, (void *)&annealing);
+
+                    if(status){
+                        fprintf(stderr, "creating server thread: %s", gai_strerror(status));
+                        window.close();
+                        return -1;
+                    }
+                }
+            }
             if(event.type == sf::Event::MouseWheelScrolled){
 
                 if(event.mouseWheelScroll.delta < 0){
@@ -73,9 +93,15 @@ int main(int argc, char * argv[])
 
         window.clear(sf::Color::Black);
         
+        // pthread_mutex_lock(&annealing_operation_mutex);
         graph.drawGraph(solution);
+        // pthread_mutex_unlock(&annealing_operation_mutex);
+
+        window.setFramerateLimit(60);
         window.display();
     }
+
+    pthread_join(calc_thread, NULL);
 
     return 0;
 }
