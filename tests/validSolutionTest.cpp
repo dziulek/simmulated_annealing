@@ -18,7 +18,7 @@ TEST(valid_solution, solomon_instances_50){
 
 
         //to do clear annealing
-        int b = annealing.parseDataFromFile("../tests/solomonInstances/solomon_50/" + fileName);
+        int b = annealing.parseDataFromFile(SimmulatedAnnealing::getPathToWorkspaceFolder() + "tests/solomonInstances/solomon_50/" + fileName);
         std::cerr << fileName << std::endl;
         if(b == -1)
             ASSERT_EQ(true, false);

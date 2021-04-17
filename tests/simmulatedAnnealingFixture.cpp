@@ -31,7 +31,7 @@ TEST_F(SimmulatedAnnealingFixture, parse_from_file){
     char directory[FILENAME_MAX];
     getcwd(directory, FILENAME_MAX);
 
-    b = simmulatedAnnealing->parseDataFromFile("../tests/testDataFiles/cvrptw4.txt");
+    b = simmulatedAnnealing->parseDataFromFile(SimmulatedAnnealing::getPathToWorkspaceFolder() + "tests/testDataFiles/cvrptw4.txt");
     // std::cerr << std::string(directory) << std::endl;
 
     ASSERT_EQ(b, 1);

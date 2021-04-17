@@ -74,6 +74,7 @@ public:
 
     std::vector<Customer> & getCustomers(){return this->customers;}
     Customer & getMagazine(){ return *this->magazine;}
+    static const std::string getPathToWorkspaceFolder();
 
     friend class Graph;
 };

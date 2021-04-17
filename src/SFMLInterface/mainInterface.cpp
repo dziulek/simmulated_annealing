@@ -5,10 +5,10 @@
 
 #include "../main/simmulated_annealing.hpp"
 
-int main()
+int main(int argc, char * argv[])
 {   
     SimmulatedAnnealing annealing;
-    annealing.parseDataFromFile("/home/czewian/Dokumenty/simmulated_annealing/tests/solomonInstances/solomon_50/C103.txt");
+    if(annealing.parseDataFromFile("../tests/solomonInstances/solomon_50/C103.txt") == -1) return -1;
 
     annealing.findInitSolution("greedy");
 

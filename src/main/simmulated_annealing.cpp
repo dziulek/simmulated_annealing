@@ -1,5 +1,25 @@
 #include "simmulated_annealing.hpp"
 
+const std::string SimmulatedAnnealing::getPathToWorkspaceFolder(){
+
+    char pathName[FILENAME_MAX];
+    getcwd(pathName, FILENAME_MAX);
+
+    std::cerr << pathName << std::endl;
+
+    std::string directory(pathName);
+    directory += "/";
+
+    auto pos = directory.rfind("/simmulated_annealing/");
+    if(pos == std::string::npos){
+        std::cerr << "cannot find directory" << std::endl;
+        return "";
+    }
+
+    directory = directory.substr(0, pos + 1);
+    directory += "simmulated_annealing/";
+    return directory;
+}
 
 void SimmulatedAnnealing::findInitSolution(const char* alg_name){
     if(customers.size() == 0){

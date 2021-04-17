@@ -9,7 +9,7 @@ int main(int argc, char * argv[]){
     srand(time(0));
     SimmulatedAnnealing annealing;
     
-    int e = annealing.parseDataFromFile("/home/czewian/Dokumenty/simmulated_annealing/tests/solomonInstances/solomon_50/C205.txt");
+    int e = annealing.parseDataFromFile(SimmulatedAnnealing::getPathToWorkspaceFolder() + "tests/solomonInstances/solomon_50/C205.txt");
     if(e == 1){
         // annealing.findInitSolution("default");
         annealing.runAlgorithm();
