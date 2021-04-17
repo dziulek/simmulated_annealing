@@ -11,7 +11,8 @@
 void * calculationThread(void * args){
     SimmulatedAnnealing * annealing = (SimmulatedAnnealing * )args;
 
-    annealing->findInitSolution("greedy");
+    // annealing->findInitSolution("greedy", true);
+    annealing->runAlgorithm("greedy", true);
 }
 
 int main(int argc, char * argv[])
@@ -19,12 +20,12 @@ int main(int argc, char * argv[])
 
     pthread_t calc_thread;
     SimmulatedAnnealing annealing;
-    if(annealing.parseDataFromFile(SimmulatedAnnealing::getPathToWorkspaceFolder() + "tests/solomonInstances/solomon_50/C103.txt") == -1) return -1;
+    if(annealing.parseDataFromFile(SimmulatedAnnealing::getPathToWorkspaceFolder() + "tests/solomonInstances/solomon_50/R109.txt") == -1) return -1;
 
 
-    CRPTW_Solution * solution = annealing.getSolution();
+    // CRPTW_Solution * solution = annealing.getSolution();
 
-    sf::RenderWindow window(sf::VideoMode(800, 800), "My window");
+    sf::RenderWindow window(sf::VideoMode(800, 800), "Demo");
     sf::View graphView;
     graphView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
     window.setView(graphView);
@@ -93,9 +94,9 @@ int main(int argc, char * argv[])
 
         window.clear(sf::Color::Black);
         
-        // pthread_mutex_lock(&annealing_operation_mutex);
-        graph.drawGraph(solution);
-        // pthread_mutex_unlock(&annealing_operation_mutex);
+        pthread_mutex_lock(&annealing.getOperationMutex());
+        graph.drawGraph(annealing.getSolution());
+        pthread_mutex_unlock(&annealing.getOperationMutex());
 
         window.setFramerateLimit(60);
         window.display();

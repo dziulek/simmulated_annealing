@@ -21,7 +21,7 @@ const std::string SimmulatedAnnealing::getPathToWorkspaceFolder(){
     return directory;
 }
 
-void SimmulatedAnnealing::findInitSolution(const char* alg_name){
+void SimmulatedAnnealing::findInitSolution(const char* alg_name, bool threadSafe){
     if(customers.size() == 0){
         //to do
         //throw exception
@@ -32,11 +32,11 @@ void SimmulatedAnnealing::findInitSolution(const char* alg_name){
     }
     //to do -> implementation of more algorithms
 
-    greedy_init_alg();
+    greedy_init_alg(threadSafe);
 }
 
 //the simplest algorithm for finding initial solution for the problem
-void SimmulatedAnnealing::greedy_init_alg(){
+void SimmulatedAnnealing::greedy_init_alg(bool threadSafe){
 
     //clear current solution
     this->solution->clearSolution();
@@ -55,13 +55,11 @@ void SimmulatedAnnealing::greedy_init_alg(){
     for(auto & customer : customers){
         cust_to_visit.push_back(&customer);
     }
-    // if(threadSave)
-    // pthread_mutex_lock(&annealing_operation_mutex);
-// #endif
-    Route * current_route = &solution->addRoute();
-// #ifdef GRAPH_HPP
-    // pthread_mutex_unlock(&annealing_operation_mutex);
-// #endif
+
+    LOCK(annealing_operation_mutex, threadSafe)
+        Route * current_route = &solution->addRoute();
+    UNLOCK(annealing_operation_mutex, threadSafe)
+
 
     for(int i = 0; i < cust_to_visit.size() -2; i++)
         for(int j = i + 1; j < cust_to_visit.size() -1; j++)
@@ -78,6 +76,11 @@ void SimmulatedAnnealing::greedy_init_alg(){
 
         bool picked = false;
 
+        SET_LATENCY(LATENCY_MICROSECONDS, threadSafe)
+        LOCK(annealing_operation_mutex, threadSafe)
+        
+
+
         for(auto & customer : cust_to_visit){
 
             if(customer->l + eps >= current_route->newBeginTime(current_route->getLastCustomer(), *customer) 
@@ -85,7 +88,9 @@ void SimmulatedAnnealing::greedy_init_alg(){
                 bool b;
                 try{
 
-                    b = current_route->appendCustomer(*customer);
+
+                        b = current_route->appendCustomer(*customer);
+
                     customer = std::move(cust_to_visit.back());
                     cust_to_visit.pop_back();
                     n_remain --;
@@ -102,10 +107,11 @@ void SimmulatedAnnealing::greedy_init_alg(){
         }
 
         if (picked == false){
+                current_route = &solution->addRoute();
 
-            current_route = &solution->addRoute();
         }
         
+        UNLOCK(annealing_operation_mutex, threadSafe)        
     }
 }
 
@@ -251,7 +257,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
 
     // this->solution = new CRPTW_Solution(*this->providerInfo);
     // this->solution = 
-    greedy_init_alg();
+    greedy_init_alg(threadSafe);
 
     if(!CRPTW_Solution::isValid(*this->solution))
         return;
@@ -302,6 +308,10 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
             if(Route::checkIfPossibleDeleteInsert(current_solution->getRoute(route_i), cust_i, 
                                         current_solution->getRoute(route_j), cust_j, routeImprv)){
                 
+                SET_LATENCY(LATENCY_MICROSECONDS, threadSafe)                
+                LOCK(annealing_operation_mutex, threadSafe)
+
+
                 random_iterations++;
                 Route::execDeleteInsert(
                     current_solution->getRoute(route_i),
@@ -309,6 +319,9 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
                     current_solution->getRoute(route_j),
                     cust_j
                 );
+                
+                UNLOCK(annealing_operation_mutex, threadSafe)
+                
                 delta = routeImprv.objectiveFunction();
                 averageDelta += abs(delta);
                 continuous_overlap = 0;
@@ -321,12 +334,18 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
                 current_solution->getRoute(route_i), cust_i,
                 current_solution->getRoute(route_j), cust_j, routeImprv
             )){
+                SET_LATENCY(LATENCY_MICROSECONDS, threadSafe)
+                LOCK(annealing_operation_mutex, threadSafe)
+                
 
                 random_iterations++;
                 Route::execSwapBetweenRoutes(
                     current_solution->getRoute(route_i), cust_i,
                     current_solution->getRoute(route_j), cust_j
                 );
+                
+                UNLOCK(annealing_operation_mutex, threadSafe)
+
                 delta = routeImprv.objectiveFunction();
                 averageDelta += abs(delta);
                 continuous_overlap = 0;
@@ -356,7 +375,10 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
         rejectedIterations = 0;
         while(optimumConstCounter < this->MAX_TIME && __counter * MIN_PERCENT <= (__counter - rejectedIterations) && solution->getNOfRoutes() > 2
                         && std::chrono::duration<double>(std::chrono::steady_clock::now() - START).count() < 10){
-
+            
+            SET_LATENCY(LATENCY_MICROSECONDS, threadSafe)
+            LOCK(annealing_operation_mutex, threadSafe)
+            
             if(nextMove(custA, routeA, custB, routeB, tabuList, moveType)){
 
                 if(moveType == Route::DELETE_INSERT){
@@ -373,11 +395,15 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
 
                 if(!CRPTW_Solution::isValid(*current_solution))
                     return;
+
+
                 //check if found best solution
                 if(current_solution->objectiveFunction() < bestSolution->objectiveFunction()){
-
+                    
+                    // LOCK(annealing_operation_mutex, threadSafe)
                     delete bestSolution;
                     bestSolution = new CRPTW_Solution(*current_solution);
+                    // UNLOCK(annealing_operation_mutex, threadSafe)
                     optimumConstCounter = 0;
                 }
                 else optimumConstCounter ++;
@@ -390,6 +416,8 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
             }
             __counter ++;
             tabuList.incrementTime();
+
+            UNLOCK(annealing_operation_mutex, threadSafe)            
         }
 
         temperature *= this->RATIO;
@@ -397,8 +425,12 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
 
         // std::cerr << "Temperature: " << temperature << std::endl;
     }
+    LOCK(annealing_operation_mutex, threadSafe)
     delete this->solution;
     this->solution = new CRPTW_Solution(*bestSolution);
+    UNLOCK(annealing_operation_mutex, threadSafe)
+
+    std::cerr << "Algorithm stopped" <<std::endl;
 
     delete bestSolution;
 }

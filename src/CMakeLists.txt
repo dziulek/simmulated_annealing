@@ -8,7 +8,7 @@ list(APPEND GRAPHIC_INTERFACE ${GRAPHIC_INTERFACE})
 list(APPEND COMMON_SOURCES ${COMMON_SOURCES})
 
 list(FILTER COMMON_SOURCES EXCLUDE REGEX main.cpp$)
-message(${COMMON_SOURCES})
+# message(${COMMON_SOURCES})
 
 add_executable(${BINARY}_run ${COMMON_SOURCES} main/main.cpp)
 add_executable(graphicInterface_run ${GRAPHIC_INTERFACE} ${COMMON_SOURCES})

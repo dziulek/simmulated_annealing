@@ -13,11 +13,11 @@
 #include <fstream>
 #include <chrono>
 #include <pthread.h>
+#include <thread>
 
-// #ifdef GRAPH_HPP
-// pthread_mutex_t annealing_operation_mutex = PTHREAD_MUTEX_INITIALIZER;
-// bool GRAPHICAL_INTERFACE = true;
-// #endif
+#define LOCK(mutex, safe) if(safe)pthread_mutex_lock(&mutex);
+#define UNLOCK(mutex, safe) if(safe)pthread_mutex_unlock(&mutex);
+#define SET_LATENCY(microseconds, safe) if(safe){usleep(microseconds);}
 
 class SimmulatedAnnealing {
 
@@ -41,7 +41,10 @@ private:
     float MAX_TIME;//
     float MIN_PERCENT;
 
-    void greedy_init_alg();
+    //for thread safe operations when running main algorithm
+    pthread_mutex_t annealing_operation_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+    void greedy_init_alg(bool threadSafe=false);
     void setParams(const float avgCostIncrease);
     bool terminateSearch();
     bool nextMove(int & CustA, int & routeA, int &custB, int & routeB, TabuList & tabuList, int & moveNumber);//algorithm for searching next move
@@ -71,19 +74,22 @@ public:
     }
 
     int parseDataFromFile(std::string fileName);
-    void findInitSolution(const char* alg_name);
+    void findInitSolution(const char* alg_name, bool threadSafe=false);
     void runAlgorithm(std::string initAlg="greedy", bool threadSafe=false);
 
     Customer & getCustomer(unsigned int index);
     ProviderInfo & getProviderInfo();
     unsigned int getCustomerNumber();
-    CRPTW_Solution * getSolution(){return this->solution;}
+    CRPTW_Solution * getSolution(bool threadSafe=false){return this->solution;}
 
     std::vector<Customer> & getCustomers(){return this->customers;}
     Customer & getMagazine(){ return *this->magazine;}
     static const std::string getPathToWorkspaceFolder();
+    
+    pthread_mutex_t & getOperationMutex(){return this->annealing_operation_mutex;}
 
     friend class Graph;
+    friend class LiveAnnealingInfo;
 };
 
 #endif
