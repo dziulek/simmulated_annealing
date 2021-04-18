@@ -9,7 +9,7 @@
 
 const float eps = 10e-9;
 const float infinity = std::numeric_limits<float>::infinity();
-const int LATENCY_MICROSECONDS = 100000;
+const int LATENCY_MICROSECONDS = 10000;
 
 const int N_RANDOM_ITERATIONS = 20;
 

@@ -23,10 +23,9 @@ void TabuList::incrementTime(){
 
 bool TabuList::isValidMove(const int custA, const int routeA, const int custB, const int routeB){
 
-    // if(this->tabu[custA][routeA] > time || this->tabu[custB][routeB] > time) return true;
+    if(this->tabu[custA][routeA] <= time || this->tabu[custB][routeB] <= time) return true;
 
-    // return false;
-    return true;
+    return false;
 }
 
 void TabuList::resetTime(){

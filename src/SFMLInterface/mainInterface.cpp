@@ -18,9 +18,11 @@ void * calculationThread(void * args){
 int main(int argc, char * argv[])
 {   
 
+    srand(time(0));
+
     pthread_t calc_thread;
     SimmulatedAnnealing annealing;
-    if(annealing.parseDataFromFile(SimmulatedAnnealing::getPathToWorkspaceFolder() + "tests/solomonInstances/solomon_50/R109.txt") == -1) return -1;
+    if(annealing.parseDataFromFile(SimmulatedAnnealing::getPathToWorkspaceFolder() + "tests/solomonInstances/solomon_100/R204.txt") == -1) return -1;
 
 
     // CRPTW_Solution * solution = annealing.getSolution();

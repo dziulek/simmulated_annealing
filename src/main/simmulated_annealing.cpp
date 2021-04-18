@@ -374,12 +374,12 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
         __counter = 0;
         rejectedIterations = 0;
         while(optimumConstCounter < this->MAX_TIME && __counter * MIN_PERCENT <= (__counter - rejectedIterations) && solution->getNOfRoutes() > 2
-                        && std::chrono::duration<double>(std::chrono::steady_clock::now() - START).count() < 10){
+                        && std::chrono::duration<double>(std::chrono::steady_clock::now() - START).count() < 100){
             
             SET_LATENCY(LATENCY_MICROSECONDS, threadSafe)
             LOCK(annealing_operation_mutex, threadSafe)
             
-            if(nextMove(custA, routeA, custB, routeB, tabuList, moveType)){
+            if(nextMove(custA, routeA, custB, routeB, tabuList, moveType, temperature)){
 
                 if(moveType == Route::DELETE_INSERT){
 
@@ -396,6 +396,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
                 if(!CRPTW_Solution::isValid(*current_solution))
                     return;
 
+                std::cerr << current_solution->getNOfRoutes() << " " << current_solution->getTotalTime() << " " << current_solution->getTotalDistance() << std::endl;
 
                 //check if found best solution
                 if(current_solution->objectiveFunction() < bestSolution->objectiveFunction()){
@@ -423,7 +424,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
         temperature *= this->RATIO;
         tabuList.actualizeTabuList();
 
-        // std::cerr << "Temperature: " << temperature << std::endl;
+        std::cerr << "Temperature: " << temperature << std::endl;
     }
     LOCK(annealing_operation_mutex, threadSafe)
     delete this->solution;
@@ -450,7 +451,7 @@ bool SimmulatedAnnealing::terminateSearch(){
 
 }
 
-bool SimmulatedAnnealing::nextMove(int & __custA, int & __routeA, int & __custB, int & __routeB, TabuList & tabuList, int & moveNumber){
+bool SimmulatedAnnealing::nextMove(int & __custA, int & __routeA, int & __custB, int & __routeB, TabuList & tabuList, int & moveNumber, float temperature){
 
     float d, p;
     routeImprovement routeImpr;
@@ -502,7 +503,7 @@ bool SimmulatedAnnealing::nextMove(int & __custA, int & __routeA, int & __custB,
                                     return true;                                    
                                 }
                                 //give a second chance with some probability 
-                                p = d * (1.f - k1) * (1.f - k2);
+                                p = secondChanceProbability(d, temperature) * (1.f - k1) * (1.f - k2);
 
                                 if(this->probabilityThreshold() > p){
 
@@ -527,7 +528,7 @@ bool SimmulatedAnnealing::nextMove(int & __custA, int & __routeA, int & __custB,
                                 }
 
                                 //give a second chance with some probability
-                                p = d * (1.f - k1) * (1.f - k2);
+                                p = secondChanceProbability(d, temperature) * (1.f - k1) * (1.f - k2);
 
                                 if(this->probabilityThreshold() > p){
 
@@ -552,7 +553,7 @@ bool SimmulatedAnnealing::nextMove(int & __custA, int & __routeA, int & __custB,
                                 }
 
                                 //give a second chance with some probability
-                                p = d * (1.f - k1) * (1.f - k2);
+                                p = secondChanceProbability(d, temperature) * (1.f - k1) * (1.f - k2);
 
                                 if(this->probabilityThreshold() > p){
 
@@ -578,4 +579,9 @@ void SimmulatedAnnealing::routeRearange(std::vector<int> & indexes){
 float SimmulatedAnnealing::probabilityThreshold(){
 
     return static_cast<float>(rand())/RAND_MAX;
+}
+
+float SimmulatedAnnealing::secondChanceProbability(float delta, float temperature){
+
+    return exp(-delta / temperature);
 }

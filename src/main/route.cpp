@@ -318,6 +318,8 @@ bool Route::checkIfPossibleDeleteInsert(Route &r1, const unsigned int _i, Route 
             if(r1.getSizeOfroute() == 3) score.routeNumber = -1;//we delete the last customer so route will be empty
             else score.routeNumber = 0;
 
+            // if(score.routeCostDiff < 0)
+            //     std::cerr << "iomposdfsd";
             return 1;
         }
 
@@ -365,6 +367,8 @@ bool Route::checkIfPossibleSwapBetweenRoutes(Route &r1, const unsigned int _i, R
             score.routeDistanceDiff = d_r1 + d_r2;
             score.routeNumber = 0;
 
+            // if(score.routeCostDiff < 0)
+            //     std::cerr << "iomposdfsd";
              return 1;
         }
     }

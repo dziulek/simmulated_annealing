@@ -47,10 +47,11 @@ private:
     void greedy_init_alg(bool threadSafe=false);
     void setParams(const float avgCostIncrease);
     bool terminateSearch();
-    bool nextMove(int & CustA, int & routeA, int &custB, int & routeB, TabuList & tabuList, int & moveNumber);//algorithm for searching next move
+    bool nextMove(int & CustA, int & routeA, int &custB, int & routeB, TabuList & tabuList, int & moveNumber, float temperature);//algorithm for searching next move
     void routeRearange(std::vector<int> & indexes);
 
     float probabilityThreshold();
+    float secondChanceProbability(float delta, float temperature);
 
     std::string stringToLower(std::string & s);
 
