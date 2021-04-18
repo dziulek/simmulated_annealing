@@ -8,8 +8,19 @@
 #include "../main/solution.hpp"
 #include <vector>
 #include <utility>
+#include <math.h>
 
+const sf::Color COLORS[] = {
+    sf::Color::White,
+    sf::Color::Red,
+    sf::Color::Cyan,
+    sf::Color::Blue,
+    sf::Color::Green,
+    sf::Color::Yellow,
+    sf::Color::Magenta
+};
 
+const int colorsNo = 7;
 
 class Graph{
 
@@ -18,9 +29,12 @@ private:
     sf::VertexArray locations;
 
     float blobRadius = 1.f;
+    float lineThickness = 1.f;
 
     sf::RenderWindow * window;
     sf::View * view;
+
+    float length(sf::Vector2f v);
 
 public:
 
