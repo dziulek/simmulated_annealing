@@ -98,35 +98,15 @@ bool CRPTW_Solution::isValid(const CRPTW_Solution & solution){
 
     for(auto & route : solution.routes){
 
-        current_time = 0.f;
-        current_distance = 0.f;
-        rem_capacity = solution.providerInfo->truck_capacity;
-
-        for(int i = 0; i < route->getSizeOfroute() - 1; i++){
-
-            rem_capacity -= (*route)[i + 1].customer->q;
-
-            current_distance += Customer::dist(*(*route)[i].customer, *(*route)[i + 1].customer);
-            current_time = Route::newBeginTime(*(*route)[i].customer, *(*route)[i + 1].customer, current_time);
-            //window constraints
-            if(current_time > (*route)[i + 1].customer->l){
-                //to do some message
-                std::cerr << "window constraint" << std::endl;
-
-                return false;
-            }
-
-            //capacity constraints
-            if(rem_capacity < 0){
-                //to do some message
-
-                std::cerr << "capacity constraint" << std::endl;
-                return false;
-            }
+        if(Route::isValid(*route)){
+            totalTime += route->getTimeCost();
+            totalCost += route->getRouteCost();
+            truckNo++;
         }
-        totalTime += current_time;
-        totalCost += current_distance;
-        truckNo ++;
+        else {
+            std::cerr << "error in " << truckNo << " route" << std::endl;
+            return false;
+        }
     }
     bool out = true;
 

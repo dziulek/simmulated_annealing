@@ -28,11 +28,13 @@ int main(int argc, char * argv[])
     // CRPTW_Solution * solution = annealing.getSolution();
 
     sf::RenderWindow window(sf::VideoMode(800, 800), "Demo");
-    sf::View graphView;
+    sf::View graphView, bestGraphView;
     graphView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
+    bestGraphView.setViewport(sf::FloatRect(0.7f, 0.7f, 0.3f, 0.3f));
     window.setView(graphView);
 
     Graph graph(window, graphView, annealing.getCustomers(), annealing.getProviderInfo());
+    Graph bestGraph(window, bestGraphView, annealing.getCustomers(), annealing.getProviderInfo());
 
     sf::Vector2f lastMousePos = window.mapPixelToCoords(sf::Mouse::getPosition());
     bool canMoveMap = false;
@@ -98,6 +100,7 @@ int main(int argc, char * argv[])
         
         pthread_mutex_lock(&annealing.getOperationMutex());
         graph.drawGraph(annealing.getSolution());
+        bestGraph.drawGraph(annealing.getBestSolution());
         pthread_mutex_unlock(&annealing.getOperationMutex());
 
         window.setFramerateLimit(60);

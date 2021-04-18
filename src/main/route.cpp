@@ -431,7 +431,7 @@ bool Route::isValid(const Route & route){
     float remCapacity = route.MAX_CAPACITY;
     float waiting_time;
 
-    float ep = 0.001;
+    float ep = 0.01;
     
     for(int i = 0; i < route.route.size() - 1; i ++){
 
@@ -466,7 +466,7 @@ bool Route::isValid(const Route & route){
 
     if(abs(currentDistance - route.route.back().distance) > ep){
 
-        std::cerr << "error in distance, expected: " << currentDistance << " , found: " << route.route.back().distance << std::endl;
+        std::cerr << "error in distance, expected: " << std::setprecision(10) << currentDistance << " , found: " << std::setprecision(10) << route.route.back().distance << std::endl;
         return false;
     }
 

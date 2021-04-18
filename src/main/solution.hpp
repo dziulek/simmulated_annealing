@@ -5,6 +5,7 @@
 #include "route.hpp"
 #include <vector>
 #include <memory>
+#include <math.h>
 
 class CRPTW_Solution{
 

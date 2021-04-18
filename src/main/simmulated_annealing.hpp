@@ -19,6 +19,10 @@
 #define UNLOCK(mutex, safe) if(safe)pthread_mutex_unlock(&mutex);
 #define SET_LATENCY(microseconds, safe) if(safe){usleep(microseconds);}
 
+#define NONE 0
+#define INIT_SOLUTION 1
+#define METAHEURISTIC 2
+
 class SimmulatedAnnealing {
 
 private:
@@ -29,6 +33,9 @@ private:
     ProviderInfo * providerInfo = nullptr;
     std::string dataSetName;
     std::vector<std::vector<int>> tabuList;
+
+    int status = NONE;
+    CRPTW_Solution * bestSolution;
 
     //temporarily redundant
     Customer * magazine = nullptr;
@@ -82,6 +89,7 @@ public:
     ProviderInfo & getProviderInfo();
     unsigned int getCustomerNumber();
     CRPTW_Solution * getSolution(bool threadSafe=false){return this->solution;}
+    CRPTW_Solution * getBestSolution();
 
     std::vector<Customer> & getCustomers(){return this->customers;}
     Customer & getMagazine(){ return *this->magazine;}

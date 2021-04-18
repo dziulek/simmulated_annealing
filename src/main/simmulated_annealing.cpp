@@ -22,6 +22,9 @@ const std::string SimmulatedAnnealing::getPathToWorkspaceFolder(){
 }
 
 void SimmulatedAnnealing::findInitSolution(const char* alg_name, bool threadSafe){
+
+    this->status = INIT_SOLUTION;
+
     if(customers.size() == 0){
         //to do
         //throw exception
@@ -232,6 +235,11 @@ unsigned int SimmulatedAnnealing::getCustomerNumber(){
     return this->customers.size();
 }
 
+CRPTW_Solution * SimmulatedAnnealing::getBestSolution(){
+    
+    return (status == METAHEURISTIC ? this->bestSolution : this->solution);
+}
+
 std::string SimmulatedAnnealing::stringToLower(std::string & s){
     std::string out = s;
     std::transform(out.begin(), out.end(), out.begin(),
@@ -266,7 +274,9 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
     CRPTW_Solution * current_solution = solution;
 
 
-    CRPTW_Solution * bestSolution = new CRPTW_Solution(*current_solution);
+    bestSolution = new CRPTW_Solution(*current_solution);
+
+    this->status = METAHEURISTIC;
 
     // return (void)"siemano";
 
@@ -393,10 +403,10 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
                     Route::execSwapBetweenRoutes(current_solution->getRoute(routeA), custA, current_solution->getRoute(routeB), custB);
                 }
 
-                if(!CRPTW_Solution::isValid(*current_solution))
-                    return;
+                // if(!CRPTW_Solution::isValid(*current_solution))
+                //     return;
 
-                std::cerr << current_solution->getNOfRoutes() << " " << current_solution->getTotalTime() << " " << current_solution->getTotalDistance() << std::endl;
+                // std::cerr << current_solution->getNOfRoutes() << " " << current_solution->getTotalTime() << " " << current_solution->getTotalDistance() << std::endl;
 
                 //check if found best solution
                 if(current_solution->objectiveFunction() < bestSolution->objectiveFunction()){
@@ -424,7 +434,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
         temperature *= this->RATIO;
         tabuList.actualizeTabuList();
 
-        std::cerr << "Temperature: " << temperature << std::endl;
+        // std::cerr << "Temperature: " << temperature << std::endl;
     }
     LOCK(annealing_operation_mutex, threadSafe)
     delete this->solution;
@@ -433,6 +443,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
 
     std::cerr << "Algorithm stopped" <<std::endl;
 
+    status = NONE;
     delete bestSolution;
 }
 
