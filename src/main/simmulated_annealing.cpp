@@ -269,7 +269,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
 
     if(!CRPTW_Solution::isValid(*this->solution))
         return;
-    // std::cerr << "after greedy" << std::endl;
+    std::cerr << "greedy algorithm: " << this->solution->getNOfRoutes() << " " << this->solution->getTotalTime() << std::endl;
 
     CRPTW_Solution * current_solution = solution;
 
@@ -323,12 +323,12 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
 
 
                 random_iterations++;
-                Route::execDeleteInsert(
-                    current_solution->getRoute(route_i),
-                    cust_i, 
-                    current_solution->getRoute(route_j),
-                    cust_j
-                );
+                // Route::execDeleteInsert(
+                //     current_solution->getRoute(route_i),
+                //     cust_i, 
+                //     current_solution->getRoute(route_j),
+                //     cust_j
+                // );
                 
                 UNLOCK(annealing_operation_mutex, threadSafe)
                 
@@ -349,10 +349,10 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
                 
 
                 random_iterations++;
-                Route::execSwapBetweenRoutes(
-                    current_solution->getRoute(route_i), cust_i,
-                    current_solution->getRoute(route_j), cust_j
-                );
+                // Route::execSwapBetweenRoutes(
+                //     current_solution->getRoute(route_i), cust_i,
+                //     current_solution->getRoute(route_j), cust_j
+                // );
                 
                 UNLOCK(annealing_operation_mutex, threadSafe)
 
@@ -368,11 +368,14 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
         //pick default value based on some heuristic
         averageDelta = 1.02;
     }
-
+    
     averageDelta /= N_RANDOM_ITERATIONS;
+
+    int bestCnt = 0;
 
     this->setParams(averageDelta);
     temperature = this->TEMPINIT;
+    std::cerr << temperature << std::endl;
 
     TabuList tabuList(*current_solution, customers.size());
 
@@ -414,6 +417,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
                     // LOCK(annealing_operation_mutex, threadSafe)
                     delete bestSolution;
                     bestSolution = new CRPTW_Solution(*current_solution);
+                    bestCnt++;
                     // UNLOCK(annealing_operation_mutex, threadSafe)
                     optimumConstCounter = 0;
                 }
@@ -442,6 +446,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
     UNLOCK(annealing_operation_mutex, threadSafe)
 
     std::cerr << "Algorithm stopped" <<std::endl;
+    std::cerr << "best solution changed " << bestCnt << " times." << std::endl;
 
     status = NONE;
     delete bestSolution;

@@ -33,7 +33,7 @@ struct routeImprovement{
     float routeCostDiff;//if less than 0 then improvement is expected
     float routeDistanceDiff;//if less than 0 then imporvement is expected
 
-    float objectiveFunction(float route_coeff=1000.f, float distance_coeff=100.f, float time_coeff=100.0f){
+    float objectiveFunction(float route_coeff=beta1, float distance_coeff=beta2, float time_coeff=beta3){
 
         return routeNumber * route_coeff + distance_coeff * routeCostDiff + time_coeff * routeDistanceDiff;
     }

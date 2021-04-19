@@ -90,7 +90,7 @@ public:
     void clearSolution();
     void addProviderInfo(ProviderInfo & provInfo);
 
-    float objectiveFunction(float route_coeff=1000.0f, float distance_coeff=100.0f, float time_coeff=100.f);
+    float objectiveFunction(float route_coeff=beta1, float distance_coeff=beta2, float time_coeff=beta3);
 
     friend class TabuList;
 

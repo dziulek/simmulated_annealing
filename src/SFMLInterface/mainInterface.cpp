@@ -8,7 +8,10 @@
 #include <stdlib.h>
 #include <netdb.h>
 
+bool thread_started = false;
+
 void * calculationThread(void * args){
+    thread_started = true;
     SimmulatedAnnealing * annealing = (SimmulatedAnnealing * )args;
 
     // annealing->findInitSolution("greedy", true);
@@ -22,7 +25,7 @@ int main(int argc, char * argv[])
 
     pthread_t calc_thread;
     SimmulatedAnnealing annealing;
-    if(annealing.parseDataFromFile(SimmulatedAnnealing::getPathToWorkspaceFolder() + "tests/solomonInstances/solomon_100/R204.txt") == -1) return -1;
+    if(annealing.parseDataFromFile(SimmulatedAnnealing::getPathToWorkspaceFolder() + "tests/solomonInstances/solomon_100/RC105.txt") == -1) return -1;
 
 
     // CRPTW_Solution * solution = annealing.getSolution();
@@ -31,10 +34,20 @@ int main(int argc, char * argv[])
     sf::View graphView, bestGraphView;
     graphView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
     bestGraphView.setViewport(sf::FloatRect(0.7f, 0.7f, 0.3f, 0.3f));
-    window.setView(graphView);
 
     Graph graph(window, graphView, annealing.getCustomers(), annealing.getProviderInfo());
     Graph bestGraph(window, bestGraphView, annealing.getCustomers(), annealing.getProviderInfo());
+
+    sf::Font font;
+    if(!font.loadFromFile(SimmulatedAnnealing::getPathToWorkspaceFolder() + "src/SFMLInterface/Open_Sans/OpenSans-Bold.ttf")){
+        std::cout << "cannot load font" << std::endl;
+    }
+    // sf::Text text;
+    // text.setFont(font);
+    // text.setString("Best Solution");
+    // text.setCharacterSize(60);
+    // text.setColor(sf::Color::White);
+    // window.draw(text);
 
     sf::Vector2f lastMousePos = window.mapPixelToCoords(sf::Mouse::getPosition());
     bool canMoveMap = false;
@@ -106,8 +119,8 @@ int main(int argc, char * argv[])
         window.setFramerateLimit(60);
         window.display();
     }
-
-    pthread_join(calc_thread, NULL);
+    if(thread_started)
+        pthread_join(calc_thread, NULL);
 
     return 0;
 }
