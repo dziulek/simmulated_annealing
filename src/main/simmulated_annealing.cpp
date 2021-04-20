@@ -79,7 +79,7 @@ void SimmulatedAnnealing::greedy_init_alg(bool threadSafe){
 
         bool picked = false;
 
-        SET_LATENCY(LATENCY_MICROSECONDS, threadSafe)
+        SET_LATENCY(LATENCY_MICROSECONDS * 25, threadSafe)
         LOCK(annealing_operation_mutex, threadSafe)
         
 
@@ -263,8 +263,6 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
         this->solution = new CRPTW_Solution(*this->providerInfo);
     }
 
-    // this->solution = new CRPTW_Solution(*this->providerInfo);
-    // this->solution = 
     greedy_init_alg(threadSafe);
 
     if(!CRPTW_Solution::isValid(*this->solution))
@@ -277,8 +275,6 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
     bestSolution = new CRPTW_Solution(*current_solution);
 
     this->status = METAHEURISTIC;
-
-    // return (void)"siemano";
 
     int random_iterations = 0;
     int continuous_overlap = 0;
@@ -375,7 +371,6 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
 
     this->setParams(averageDelta);
     temperature = this->TEMPINIT;
-    std::cerr << temperature << std::endl;
 
     TabuList tabuList(*current_solution, customers.size());
 
@@ -409,16 +404,13 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
                 // if(!CRPTW_Solution::isValid(*current_solution))
                 //     return;
 
-                // std::cerr << current_solution->getNOfRoutes() << " " << current_solution->getTotalTime() << " " << current_solution->getTotalDistance() << std::endl;
 
                 //check if found best solution
                 if(current_solution->objectiveFunction() < bestSolution->objectiveFunction()){
                     
-                    // LOCK(annealing_operation_mutex, threadSafe)
                     delete bestSolution;
                     bestSolution = new CRPTW_Solution(*current_solution);
                     bestCnt++;
-                    // UNLOCK(annealing_operation_mutex, threadSafe)
                     optimumConstCounter = 0;
                 }
                 else optimumConstCounter ++;
@@ -438,7 +430,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
         temperature *= this->RATIO;
         tabuList.actualizeTabuList();
 
-        // std::cerr << "Temperature: " << temperature << std::endl;
+        // std::cerr << temperature << " " << bestSolution->getTotalTime() << " " << current_solution->getTotalTime() << std::endl;
     }
     LOCK(annealing_operation_mutex, threadSafe)
     delete this->solution;
@@ -478,12 +470,12 @@ bool SimmulatedAnnealing::nextMove(int & __custA, int & __routeA, int & __custB,
     route2Indexes.resize(this->solution->getNOfRoutes());
     for(int i = 0; i < this->solution->getNOfRoutes(); i++){
 
-        route1Indexes[i] = i;
         route2Indexes[i] = i;
+        route1Indexes[i] = route1Indexes.size() - 1 - i;
     }
 
-    this->routeRearange(route1Indexes);
-    this->routeRearange(route2Indexes);
+    // this->routeRearange(route1Indexes);
+    // this->routeRearange(route2Indexes);
 
     for(auto & i : route1Indexes){
 
@@ -526,7 +518,8 @@ bool SimmulatedAnnealing::nextMove(int & __custA, int & __routeA, int & __custB,
                                     tabuList.recordOperation(custA, i, custB, j);
                                     return true;
                                 }
-                            }      
+                            }    
+                            else tabuList.recordOperation(custA, i, custB, j);   
                         }//try reverse insertion
                         else if(Route::checkIfPossibleDeleteInsert(
                             solution->getRoute(j), custB, solution->getRoute(i), custA, routeImpr
@@ -551,7 +544,8 @@ bool SimmulatedAnnealing::nextMove(int & __custA, int & __routeA, int & __custB,
                                     tabuList.recordOperation(custB, j, custA, i);
                                     return true;
                                 }
-                            }                                 
+                            }  
+                            else tabuList.recordOperation(custB, j, custA, i);                                
                         }
                     }
                     else {
@@ -576,7 +570,8 @@ bool SimmulatedAnnealing::nextMove(int & __custA, int & __routeA, int & __custB,
                                     tabuList.recordOperation(custA, i, custB, j);
                                     return true;
                                 }      
-                            }               
+                            } 
+                            else tabuList.recordOperation(custA, i, custB, j);              
                         }
                     }
                 }

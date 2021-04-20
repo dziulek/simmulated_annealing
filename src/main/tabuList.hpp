@@ -25,6 +25,7 @@ public:
         time = 0;
         
         tabuPeriod = nCustomers / 10;
+        // tabuPeriod = 1;
     }
 
     virtual ~TabuList(){
