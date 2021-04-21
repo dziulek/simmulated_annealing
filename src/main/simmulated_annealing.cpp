@@ -65,6 +65,7 @@ void SimmulatedAnnealing::random_init_alg(bool threadSafe){
 
     while(n_left > 0){
         
+        SET_LATENCY(LATENCY_MICROSECONDS * 25, threadSafe)
         LOCK(annealing_operation_mutex, threadSafe)
 
         int n = current_route->getSizeOfroute();
@@ -261,7 +262,7 @@ int SimmulatedAnnealing::parseDataFromFile(std::string fileName){
 
     std::cout << "Data Succesfully loaded.\n" + std::to_string(customers.size()) + " customers.\n";
 
-    return 1;
+    return 0;
 }
 
 Customer & SimmulatedAnnealing::getCustomer(unsigned int index){
@@ -315,7 +316,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
 
     if(!CRPTW_Solution::isValid(*this->solution))
         return;
-    std::cerr << "greedy algorithm: " << this->solution->getNOfRoutes() << " " << this->solution->getTotalTime() << std::endl;
+    // std::cerr << "greedy algorithm: " << this->solution->getNOfRoutes() << " " << this->solution->getTotalTime() << std::endl;
 
     CRPTW_Solution * current_solution = solution;
 
@@ -362,7 +363,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
             if(Route::checkIfPossibleDeleteInsert(current_solution->getRoute(route_i), cust_i, 
                                         current_solution->getRoute(route_j), cust_j, routeImprv)){
                 
-                SET_LATENCY(LATENCY_MICROSECONDS, threadSafe)                
+                SET_LATENCY(LATENCY_MICROSECONDS * 25, threadSafe)                
                 LOCK(annealing_operation_mutex, threadSafe)
 
 
@@ -486,7 +487,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
     UNLOCK(annealing_operation_mutex, threadSafe)
 
     std::cerr << "Algorithm stopped" <<std::endl;
-    std::cerr << "best solution changed " << bestCnt << " times." << std::endl;
+    // std::cerr << "best solution changed " << bestCnt << " times." << std::endl;
 
     status = NONE;
     delete bestSolution;
