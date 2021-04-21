@@ -37,3 +37,6 @@ old_version.cpp
 build/
 debug/
 src/SFMLInterface/Open_Sans/
+
+old_version
+wynik.txt
