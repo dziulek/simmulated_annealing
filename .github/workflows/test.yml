@@ -20,4 +20,4 @@ jobs:
     - name: make
       run: cd build && make
     - name: Run Test
-      run: cd build && ./tests/test_tst
+      run: cd build && ./tests/annealing_tst
