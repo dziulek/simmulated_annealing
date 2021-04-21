@@ -11,21 +11,14 @@ int main(int argc, char * argv[]){
     
     int e = annealing.parseDataFromFile(SimmulatedAnnealing::getPathToWorkspaceFolder() + "tests/solomonInstances/solomon_100/RC105.txt");
     if(e == 1){
-        // annealing.findInitSolution("default");
+        // annealing.findInitSolution("insertion");
         annealing.runAlgorithm();
 
         std::cout <<"valid solution: " << CRPTW_Solution::isValid(*annealing.getSolution()) << std::endl;
 
         CRPTW_Solution * solution = annealing.getSolution();
 
-        for(int i = 0; i < solution->getNOfRoutes(); i++){
-            for(int j = 0; j < solution->getRoute(i).getSizeOfroute(); j++){
-                std::cout << solution->getRoute(i)[j].customer->id << " ";
-            }
-            std::cout<<std::endl;
-        }        
-        std::cout << solution->getNOfRoutes() << " " << solution->getTotalDistance() << " " << solution->getTotalTime() << std::endl;
-
+        std::cout << *solution;
     }
 
     return 0;

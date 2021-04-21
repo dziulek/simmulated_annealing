@@ -15,7 +15,7 @@ void * calculationThread(void * args){
     SimmulatedAnnealing * annealing = (SimmulatedAnnealing * )args;
 
     // annealing->findInitSolution("greedy", true);
-    annealing->runAlgorithm("greedy", true);
+    annealing->runAlgorithm("insertion", true);
 }
 
 int main(int argc, char * argv[])
@@ -25,7 +25,7 @@ int main(int argc, char * argv[])
 
     pthread_t calc_thread;
     SimmulatedAnnealing annealing;
-    if(annealing.parseDataFromFile(SimmulatedAnnealing::getPathToWorkspaceFolder() + "tests/solomonInstances/solomon_100/RC105.txt") == -1) return -1;
+    if(annealing.parseDataFromFile(SimmulatedAnnealing::getPathToWorkspaceFolder() + "tests/solomonInstances/solomon_50/R105.txt") == -1) return -1;
 
 
     // CRPTW_Solution * solution = annealing.getSolution();

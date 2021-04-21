@@ -377,15 +377,14 @@ bool Route::checkIfPossibleSwapBetweenRoutes(Route &r1, const unsigned int _i, R
 
 bool Route::execDeleteInsert(Route &r1, const unsigned int _i, Route &r2, const unsigned int _j){
 
-    // std::cerr << "delete insert" << std::endl;
-    // try{
+    try{
         r2.insertCustomerIntoRoute(*r1[_i].customer, _j);
 
-    // }catch(const std::exception & e){
+    }catch(const std::exception & e){
         
-    //     std::cout << e.what() << std::endl;
-    //     return false;
-    // }
+        std::cout << e.what() << std::endl;
+        return false;
+    }
 
     r1.deleteCustomer(_i);
 
@@ -394,34 +393,31 @@ bool Route::execDeleteInsert(Route &r1, const unsigned int _i, Route &r2, const 
 
 bool Route::execSwapBetweenRoutes(Route &r1, const unsigned int _i, Route &r2, const unsigned int _j){
 
-    // std::cerr << "swap" << std::endl;
-
     Customer * c1 = r1[_i].customer;
     Customer * c2 = r2[_j].customer;
 
-    r1.deleteCustomer(_i);
-    r2.deleteCustomer(_j);
 
-    r1.insertCustomerIntoRoute(*c2, _i);
-    r2.insertCustomerIntoRoute(*c1, _j);
+    try
+    {
+        r1.deleteCustomer(_i);
+        r2.deleteCustomer(_j);
 
-    // try
-    // {
-        
-    // }
-    // catch(const std::exception& e)
-    // {
-    //     std::cerr << e.what() << std::endl;
-    //     return false;
-    // }
+        r1.insertCustomerIntoRoute(*c2, _i);
+        r2.insertCustomerIntoRoute(*c1, _j);        
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+        return false;
+    }
     
-    // try{
+    try{
         
-    // }
-    // catch(const std::exception & e){
+    }
+    catch(const std::exception & e){
         
-    //     std::cout << e.what() << std::endl;
-    // }
+        std::cout << e.what() << std::endl;
+    }
 }
 
 bool Route::isValid(const Route & route){

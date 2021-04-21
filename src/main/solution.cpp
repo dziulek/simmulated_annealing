@@ -135,3 +135,21 @@ bool CRPTW_Solution::isValid(const CRPTW_Solution & solution){
 
     return out;
 }
+
+std::ostream & operator<<(std::ostream & os, const CRPTW_Solution & solution){
+
+    os<< solution.getNOfRoutes() << " " << solution.getTotalTime() << " " << solution.getTotalDistance() << std::endl;
+    
+    os<< std::endl;
+
+    for(auto & route : solution.routes){
+
+        for(int i = 0; i < route->getSizeOfroute(); i++){
+
+            os<< (*route)[i].customer->id << " ";
+        }
+        os << std::endl;
+    }
+
+    return os;
+}

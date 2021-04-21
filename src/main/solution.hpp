@@ -44,24 +44,6 @@ public:
     bool operator>(CRPTW_Solution & solution);
 
     CRPTW_Solution(const CRPTW_Solution & solution){
-        
-        // std::cerr << "in solution copy constructor" << std::endl;
-        // if(this->providerInfo != nullptr)
-        //     this->providerInfo = new ProviderInfo{
-
-        //         solution.providerInfo->vehicle_number,
-        //         solution.providerInfo->warehouse_x,
-        //         solution.providerInfo->warehouse_y,                
-        //         solution.providerInfo->truck_capacity,
-        //         solution.providerInfo->due_date               
-        //     };
-
-        // this->providerInfo->due_date = solution.providerInfo->due_date;
-        // if(this->providerInfo != nullptr){
-        //     delete this->providerInfo;
-        // }
-        
-        // this->providerInfo = new ProviderInfo;
 
         this->providerInfo = solution.providerInfo;
 
@@ -95,6 +77,8 @@ public:
     friend class TabuList;
 
     static bool isValid(const CRPTW_Solution & solution);
+
+    friend std::ostream & operator<<(std::ostream & os, const CRPTW_Solution & solution);
 };
 
 #endif

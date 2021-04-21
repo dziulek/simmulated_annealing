@@ -34,8 +34,61 @@ void SimmulatedAnnealing::findInitSolution(const char* alg_name, bool threadSafe
         //throw exception
     }
     //to do -> implementation of more algorithms
+    if(!strcmp("greedy", alg_name))
+        greedy_init_alg(threadSafe);
+    else if(!strcmp("insertion", alg_name))
+        random_init_alg(threadSafe);
+}
 
-    greedy_init_alg(threadSafe);
+void SimmulatedAnnealing::random_init_alg(bool threadSafe){
+
+    this->solution->clearSolution();
+    if(customers.size() == 0){
+        std::cerr << "No customers in data set" << std::endl;
+        std::cerr << "Algorithm stopped" << std::endl;
+        return;
+    }
+
+
+    std::vector<bool> visited_customers(0, customers.size());
+    unsigned int n_left = customers.size();
+
+    std::vector<Customer *> cust_to_visit;
+    for(auto & customer : customers){
+        cust_to_visit.push_back(&customer);
+    }
+
+    LOCK(annealing_operation_mutex, threadSafe)
+
+    Route * current_route = &this->solution->addRoute();
+    UNLOCK(annealing_operation_mutex, threadSafe)
+
+    while(n_left > 0){
+        
+        LOCK(annealing_operation_mutex, threadSafe)
+
+        int n = current_route->getSizeOfroute();
+        bool picked = false;
+
+        for(int i = 0; i < cust_to_visit.size(); i++){
+
+                try{
+                    current_route->appendCustomer(*cust_to_visit[i]);
+                }
+                catch(std::exception & e){
+                    continue;
+                }
+                picked = true;
+                cust_to_visit.erase(cust_to_visit.begin() + i);
+                n_left--;
+                break;
+        }
+
+        if(picked == false)
+            current_route = &this->solution->addRoute();
+
+        UNLOCK(annealing_operation_mutex, threadSafe)
+    }
 }
 
 //the simplest algorithm for finding initial solution for the problem
@@ -62,11 +115,6 @@ void SimmulatedAnnealing::greedy_init_alg(bool threadSafe){
     LOCK(annealing_operation_mutex, threadSafe)
         Route * current_route = &solution->addRoute();
     UNLOCK(annealing_operation_mutex, threadSafe)
-
-
-    for(int i = 0; i < cust_to_visit.size() -2; i++)
-        for(int j = i + 1; j < cust_to_visit.size() -1; j++)
-            Customer::dist(*cust_to_visit[i], *cust_to_visit[j]);
     
     while(n_remain > 0){
         
@@ -263,7 +311,7 @@ void SimmulatedAnnealing::runAlgorithm(std::string initAlg, bool threadSafe){
         this->solution = new CRPTW_Solution(*this->providerInfo);
     }
 
-    greedy_init_alg(threadSafe);
+    findInitSolution(initAlg.c_str(), threadSafe);
 
     if(!CRPTW_Solution::isValid(*this->solution))
         return;

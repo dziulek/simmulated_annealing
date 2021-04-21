@@ -14,6 +14,7 @@
 #include <chrono>
 #include <pthread.h>
 #include <thread>
+#include <cstring>
 
 #define LOCK(mutex, safe) if(safe)pthread_mutex_lock(&mutex);
 #define UNLOCK(mutex, safe) if(safe)pthread_mutex_unlock(&mutex);
@@ -52,6 +53,7 @@ private:
     pthread_mutex_t annealing_operation_mutex = PTHREAD_MUTEX_INITIALIZER;
 
     void greedy_init_alg(bool threadSafe=false);
+    void random_init_alg(bool threadSafe=false);
     void setParams(const float avgCostIncrease);
     bool terminateSearch();
     bool nextMove(int & CustA, int & routeA, int &custB, int & routeB, TabuList & tabuList, int & moveNumber, float temperature);//algorithm for searching next move
