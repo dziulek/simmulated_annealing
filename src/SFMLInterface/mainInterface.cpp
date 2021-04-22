@@ -35,6 +35,9 @@ int main(int argc, char * argv[])
     graphView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
     bestGraphView.setViewport(sf::FloatRect(0.7f, 0.7f, 0.3f, 0.3f));
 
+    sf::View statsView;
+    statsView.setViewport(sf::FloatRect(0.7f, 0.1f, 0.3f, 0.5f));
+
     Graph graph(window, graphView, annealing.getCustomers(), annealing.getProviderInfo());
     Graph bestGraph(window, bestGraphView, annealing.getCustomers(), annealing.getProviderInfo());
 
@@ -42,12 +45,41 @@ int main(int argc, char * argv[])
     if(!font.loadFromFile(SimmulatedAnnealing::getPathToWorkspaceFolder() + "src/SFMLInterface/Open_Sans/OpenSans-Bold.ttf")){
         std::cout << "cannot load font" << std::endl;
     }
-    // sf::Text text;
-    // text.setFont(font);
-    // text.setString("Best Solution");
-    // text.setCharacterSize(60);
-    // text.setColor(sf::Color::White);
-    // window.draw(text);
+    sf::Text text;
+    text.setFont(font);
+    text.setString("Best Solution");
+    text.setCharacterSize(60);
+    text.setColor(sf::Color::White);
+    float text_width = text.getLocalBounds().width, text_height = text.getLocalBounds().height;
+    text.setOrigin(sf::Vector2f(text_width / 2, text_height / 2));
+    text.setPosition(sf::Vector2f(statsView.getSize().x / 2, text_height / 2));
+
+    sf::Text text_curr;
+    text_curr.setFont(font);
+    text_curr.setString("Current Solution");
+    text_curr.setCharacterSize(60);
+    text_curr.setColor(sf::Color::White);
+    float width_text_curr = text_curr.getLocalBounds().width, height_text_curr = text_curr.getLocalBounds().height;
+    text_curr.setOrigin(sf::Vector2f(width_text_curr / 2, height_text_curr / 2));
+    text_curr.setPosition(sf::Vector2f(statsView.getSize().x / 2, height_text_curr / 2 + 6.1 * text_height));
+
+    sf::Text text_init;
+    text_init.setFont(font);
+    text_init.setString("Initial Solution");
+    text_init.setCharacterSize(60);
+    text_init.setColor(sf::Color::White);
+    float width_text_init = text_init.getLocalBounds().width, height_text_init = text_init.getLocalBounds().height;
+    text_init.setOrigin(sf::Vector2f(width_text_init / 2, height_text_init / 2));
+    text_init.setPosition(sf::Vector2f(statsView.getSize().x / 2, height_text_init / 2 + 12.2 * text_height));
+
+    sf::Text text_cost;
+    text_cost.setFont(font);
+    text_cost.setString("0");
+    text_cost.setCharacterSize(70);
+    text_cost.setColor(sf::Color::White);
+    float width_text_cost = text_cost.getLocalBounds().width, height_text_cost = text_cost.getLocalBounds().height;
+    text_cost.setOrigin(sf::Vector2f(width_text_cost / 2, height_text_cost / 2));
+    text_cost.setPosition(sf::Vector2f(statsView.getSize().x / 2, height_text_cost / 2 + 12.2 * text_height));
 
     sf::Vector2f lastMousePos = window.mapPixelToCoords(sf::Mouse::getPosition());
     bool canMoveMap = false;
@@ -110,8 +142,26 @@ int main(int argc, char * argv[])
         }
 
         window.clear(sf::Color::Black);
-        
+
+
         pthread_mutex_lock(&annealing.getOperationMutex());
+
+        // window.setView(statsView);
+        // window.draw(text);
+        // text_cost.setPosition(sf::Vector2f(statsView.getSize().x / 2, 3.05 * text_height));
+        // text_cost.setString(std::to_string((int)annealing.getBestSolution()->getTotalTime()));
+        // window.draw(text_cost);
+        // window.draw(text_curr);
+        // text_cost.setPosition(sf::Vector2f(statsView.getSize().x / 2, 9.05 * text_height));
+        // text_cost.setString(std::to_string((int)annealing.getSolution()->getTotalTime()));
+        // window.draw(text_cost);
+        // window.draw(text_init);
+        // text_cost.setPosition(sf::Vector2f(statsView.getSize().x / 2, 15.05 * text_height));
+        // if(annealing.status == INIT_SOLUTION)
+        //     text_cost.setString(std::to_string((int)annealing.getSolution()->getTotalTime()));
+        // window.draw(text_cost);
+
+        
         graph.drawGraph(annealing.getSolution());
         bestGraph.drawGraph(annealing.getBestSolution());
         pthread_mutex_unlock(&annealing.getOperationMutex());

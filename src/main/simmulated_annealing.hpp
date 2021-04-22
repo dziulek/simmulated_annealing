@@ -35,7 +35,6 @@ private:
     std::string dataSetName;
     std::vector<std::vector<int>> tabuList;
 
-    int status = NONE;
     CRPTW_Solution * bestSolution;
 
     //temporarily redundant
@@ -69,6 +68,8 @@ private:
     
 
 public:
+
+    int status = NONE;
 
     SimmulatedAnnealing(){
         solution = new CRPTW_Solution(); 
